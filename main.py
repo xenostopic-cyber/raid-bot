@@ -1260,6 +1260,48 @@ async def araid(interaction: discord.Interaction, delay: float = 0.01):
 
 
 
+@bot.tree.command(name="webhookspam", description="Spam a webhook")
+@app_commands.describe(
+    webhook_url="The Discord webhook URL",
+    msg="The message to send",
+    amount="How many messages to send (1–999)",
+    name="Custom webhook username",
+    pfp_image_link="Custom webhook profile picture (image URL)"
+)
+async def webhookspam(
+    interaction: discord.Interaction, 
+    webhook_url: str, 
+    msg: str, 
+    amount: int = 1, 
+    name: str = "Xenostopic", 
+    pfp_image_link: str = None
+):
+    if amount < 1: amount = 1
+    if amount > 999: amount = 999
+    if not re.match(r'^https://discord\.com/api/webhooks/', webhook_url):
+        await interaction.response.send_message("invalid webhook url", ephemeral=True)
+        return
+
+    await interaction.response.send_message(f"sending **{amount}** messages to webhook...", ephemeral=True)
+    async with aiohttp.ClientSession() as session:
+        payload = {
+            "content": msg,
+            "username": name,
+        }
+        if pfp_image_link:
+            payload["avatar_url"] = pfp_image_link
+
+        for _ in range(amount):
+            try:
+                async with session.post(webhook_url, json=payload) as resp:
+                    if resp.status == 429: # Hit a rate limit
+                        retry_after = (await resp.json()).get("retry_after", 1)
+                        await asyncio.sleep(retry_after)
+            except Exception as err:
+                print(f"[/webhookspam] error: {err}")
+            
+            await asyncio.sleep(1)
+            
 @bot.tree.command(name="say", description="Make the bot say something you want, anonymously.")
 @app_commands.describe(message="The message you want the bot to say.")
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
