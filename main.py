@@ -1258,8 +1258,6 @@ async def araid(interaction: discord.Interaction, delay: float = 0.01):
     )
     update_leaderboard(interaction.user.id, "raid")
 
-
-
 @bot.tree.command(name="webhookspam", description="Spam a webhook")
 @app_commands.describe(
     webhook_url="The Discord webhook URL",
@@ -1299,9 +1297,8 @@ async def webhookspam(
                         await asyncio.sleep(retry_after)
             except Exception as err:
                 print(f"[/webhookspam] error: {err}")
-            
-            await asyncio.sleep(1)
-            
+
+         
 @bot.tree.command(name="say", description="Make the bot say something you want, anonymously.")
 @app_commands.describe(message="The message you want the bot to say.")
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
