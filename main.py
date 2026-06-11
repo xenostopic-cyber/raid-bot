@@ -1258,6 +1258,93 @@ async def araid(interaction: discord.Interaction, delay: float = 0.01):
     )
     update_leaderboard(interaction.user.id, "raid")
 
+
+@bot.tree.command(
+    name="threadspam",
+    description="Spam threads with a selfbot"
+)
+@app_commands.describe(
+    token="User token of the account to use",
+    channelid="Channel to thread spam",
+    amount="Amount of threads (1-25)",
+    delay="Delay between thread creation (500-10000)",
+    message="What to name the threads",
+    userid="da user id ofc what else"
+)
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.user_install()
+async def threadspammer(
+    ctx: discord.Interaction,
+    token: str,
+    channelid: int,
+    delay: int,
+    amount: int,
+    message: str,
+    userid: int
+):
+    # Validate inputs
+    if delay < 1000:
+        delay = 1000
+    if delay > 10000:
+        delay = 10000
+    if amount > 25:
+        amount = 25
+    if amount < 1:
+        amount = 1
+    
+    # Get the user ID from ctx if userid param is not provided correctly
+    userId = ctx.user.id
+    
+    dihcord = f"https://discord.com/api/v10/channels/{channelid}/threads"
+    
+    payload = {
+        "name": message,
+        "type": 11,  # public thread
+        "auto_archive_duration": 1440,
+    }
+
+    headers = {
+        "Authorization": token,
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 11.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0"
+    }
+
+    # Send initial response
+    await ctx.response.send_message(
+        "# ***Cyber Spammer EZZ***\n"
+        "**DISCLAIMER:**\n"
+        "- Use ***ONLY*** alt usertokens for this command \n"
+        "- Use ur main token = ban from dihcord \n"
+        "-# and oh ya if shi doesn't work the token/channelid was incorrect or the account doesnt have access to create threads in the channel",
+        ephemeral=True
+    )
+
+    async with aiohttp.ClientSession() as session:
+        for i in range(amount):
+            try:
+                async with session.post(dihcord, headers=headers, json=payload) as resp:
+                    if resp.status == 403:
+                        print(f"[{userId} - /threadspam ] Missing Permissions (403)")
+                        await ctx.followup.send(f"[{userId} - /threadspam ] Missing Permissions (403)")
+                        break
+                    if resp.status == 400:
+                        print(f"[{userId} - /threadspam ] Bad Request (400)")
+                        await ctx.followup.send(f"[{userId} - /threadspam ] Bad Request (400)")
+                        break
+                    if not resp.ok:
+                        print(f"/threadspam Error status {resp.status}")
+                        await ctx.followup.send(f"/threadspam Error status {resp.status}")
+                        break
+            except Exception as err:
+                print(f"[{userId} - /threadspam ] Network/fetch error: {str(err)}")
+                await ctx.followup.send(f"[{userId} - /threadspam ] Network/fetch error: {str(err)}")
+                break
+
+            if i < amount - 1:
+                await asyncio.sleep(delay / 1000)
+    
+    await ctx.followup.send(f"Done spamming {amount} threads!")
+    
 @bot.tree.command(name="webhookspam", description="Spam a webhook")
 @app_commands.describe(
     webhook_url="The Discord webhook URL",
@@ -1266,6 +1353,8 @@ async def araid(interaction: discord.Interaction, delay: float = 0.01):
     name="Custom webhook username",
     pfp_image_link="Custom webhook profile picture (image URL)"
 )
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.user_install()
 async def webhookspam(
     interaction: discord.Interaction, 
     webhook_url: str, 
