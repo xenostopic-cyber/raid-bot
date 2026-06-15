@@ -1307,7 +1307,7 @@ async def araid(interaction: discord.Interaction, delay: float = 0.01):
         return
 
 
-raid_message = f"{'[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je) ' * 39} @everyone"
+raid_message = f"# ***{'[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je) ' * 38}@everyone***"
     try:
         view = FloodButton(raid_message, delay)
         await interaction.response.send_message("Press the button to start raiding.", view=view, ephemeral=True)
