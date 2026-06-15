@@ -1042,7 +1042,7 @@ https://tenor.com/view/cat-hacking-silly-cat-hacker-cat-hacker-gif-1485244536247
 ]
 
 BLANKFLOOD = open("blankflood.txt", "r", encoding="utf8").read()
-
+UNISPAM = "# " + "﷽" * 1998
 SCARY = [
     """
 # [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
@@ -1249,7 +1249,7 @@ class BspamButton(discord.ui.View):
 @bot.tree.command(name="spam", description="Spam random messages with different styles.")
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 @app_commands.describe(
-    style="Choose spam style (ragebait, scary, ascii, hentai, blankflood)",
+    style="Choose any of the spam styles",
     delay="Delay between messages (0.01 to 5.00 seconds)."
 )
 async def bspam(interaction: discord.Interaction, style: str, delay: float = 0.5):
@@ -1271,6 +1271,9 @@ async def bspam(interaction: discord.Interaction, style: str, delay: float = 0.5
         spam_list = HENTAI
     elif style == "blankflood":
         spam_list = BLANKFLOOD
+    elif style == "unispam":
+        spam_list = UNISPAM
+    
     else:
         await interaction.response.send_message("❌ Invalid style! Choose from the ones above nigga.", ephemeral=True)
         return
