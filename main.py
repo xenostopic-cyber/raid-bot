@@ -1004,17 +1004,21 @@ https://media.discordapp.net/attachments/1033345223251742811/1072223159723491348
 
 """
 https://cdn.discordapp.com/attachments/1355691840581669024/1362642623072043129/2186E4AB-0714-49BD-8CF5-E400482F734D.gif?ex=6954a356&is=695351d6&hm=ed0ee0045a06a34b18146452903c8bc29397a09e9348380e9d206e4c2a3379f6&
+https://cdn.discordapp.com/attachments/1509863564385456168/1513110442212331590/Screenshot_2026-06-07_at_11.14.59.png?ex=6a306ca9&is=6a2f1b29&hm=7ada71911846a5aaf466ed63ab763823fd82942a003f5bf4f1e8bd14f6d8e924
+https://cdn.discordapp.com/attachments/1509863564385456168/1509948828009107507/Screenshot_2026-05-09_at_21.26.38.png?ex=6a30c9ae&is=6a2f782e&hm=045d949bd199e19c74ae8ae65f1241a918631e7f85d307ebddc8bce5a9fc49e1
+https://cdn.discordapp.com/attachments/1509863564385456168/1510385916215300228/Screenshot_2026-05-30_at_22.50.33.png?ex=6a306680&is=6a2f1500&hm=326f0bfff74d50c7591ec21cca1dfadccfc5458c0fb3b5b145b3ca0630973fa4
 """
 ,
             
     """
-# YOU HAVE BEEN RAIDED BY [CYBER 🆘](https://tenor.com/view/mooning-show-butt-shake-butt-pants-down-gif-17077775)
-# RAID ANY SERVER WITHOUT ADMIN PERMS 🔐
-# FREE, EASY TO USE, UP 24/7
-# ANONYMOUSLY RAID ANY SERVER YOU WANT
+# YOUR SERVES HAS BEEN FUCKED BY [CYBER ](https://tenor.com/view/mooning-show-butt-shake-butt-pants-down-gif-17077775)
+# RAID ANY SERVER WITHOUT NEEDING ANY ADMIN PERMS LOL
+# FREE AND VERY EASY TO USE IF U HAVE A FUCKING BRAIN 
+# GET A CHANCE TO HOST IT URSELF AT, ALL CODES ARE OPEN SOURCE
+# GIVE ME A FOLLOW IF YOU CAN AT [MY GITHUB](https://github.com/xenostopic-cyber)
 # "IF YOU CANT BEAT THEM, [JOIN](https://discord.com/invite/DVtWPzSmns) THEM! @everyone"
 ⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀                            [JOIN CYBER, RAID ANY SERVER YOU WANT, ANYTIME, ANYWHERE, ANYWHERE](https://discord.com/invite/DVtWPzSmns)
+⠀⠀⠀⠀⠀⠀⠀                            [JOIN CYBER, RAID ANY SERVER YOU WANT, HOST IT URSELF, BE A SKID AND NOT A JEW](https://discord.com/invite/DVtWPzSmns)
  
 [穹忩犈垃箚泗趨菋纳攇幀驼懅七](https://cdn.discordapp.com/attachments/1153733814732992573/1166450104350290020/d480327590432d30f979d4ce46baea6b.gif?ex=686e1290&is=686cc110&hm=312bf638b772621b7e9f33ac2f62832c5d417a7dbd08a307d5ae94e96cc9d8d1&)
     """,
@@ -1028,29 +1032,95 @@ https://tenor.com/view/cat-hacking-silly-cat-hacker-cat-hacker-gif-1485244536247
 @everyone
     """,
     """
-# [CYBER](https://tenor.com/view/flashbang-guy-screaming-guy-getting-flashbang-blinded-blinding-gif-1425127881206275521) __DOMINATES__ ALL 👑
-# GET __RAIDED__, YOU RETARD FAGGOTS CAN'T HANDLE THIS 😭 🥀 🥀
-# NIGGA IMAGINE NOT BEING ABLE TO PROPERLY SET A SERVER UP AND HAVING RETARD ADMINS
+# [CYBER](https://tenor.com/view/flashbang-guy-screaming-guy-getting-flashbang-blinded-blinding-gif-1425127881206275521) ON TOP BABYYYYYYYYYYY
+# GET __RAIDED NIGGA__, YOU DUMBASS FUCKFACES CAN'T HANDLE THIS SHIT LOLLL
+# [WE ALL KNOW HOW MUCH OF A RETARD YOU ARE](https://gh.xenostopicyber.xo.je)
 # BETTER [JOIN](https://discord.com/invite/DVtWPzSmns) CYBER AND START RAIDING, WE ALL KNOW YOU WANT TO
+# OR VISIT MY PROFILE, CLICK [HERE](https://gh.xenostopicyber.xo.je) AND MESSAGE ME FOR MORE INFO
 @everyone
     """
 ]
 
+BLANKFLOOD = open("blankflood.txt", "r", encoding="utf8").read()
 
 SCARY = [
     """
-    # [CYBER](https://media.tenor.com/uw5s-aHlviAAAAAM/scary-ghost.gif)
-    # [CYBER](https://discord.com/invite/DVtWPzSmns)
-    # [CYBER](https://tenor.com/view/yapping-creepy-under-the-bed-talking-ghost-gif-10296050582380126660)
-    # [CYBER](https://cdn.discordapp.com/attachments/1416037733322719364/1418258241879539733/RussianSleepExperimentGuy.png?ex=68cd776a&is=68cc25ea&hm=4141a571871aebcf5e93aa57d505285a924103536892e8a5b3ff0636c7ff2590&)
-    @everyone
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+
+# [CYBER](https://media.tenor.com/uw5s-aHlviAAAAAM/scary-ghost.gif)
+# [CYBER](https://discord.com/invite/DVtWPzSmns)
+# [CYBER](https://tenor.com/view/yapping-creepy-under-the-bed-talking-ghost-gif-10296050582380126660)
+# [CYBER](https://cdn.discordapp.com/attachments/1416037733322719364/1418258241879539733/RussianSleepExperimentGuy.png?ex=68cd776a&is=68cc25ea&hm=4141a571871aebcf5e93aa57d505285a924103536892e8a5b3ff0636c7ff2590&)
+@everyone
     """,
     """
-    # [CYBER](https://media.tenor.com/HMtY33kDWFwAAAAM/donk.gif)
-    # [CYBER](https://nightmarenostalgia.com/wp-content/uploads/2023/07/main-qimg-522ae83e590c80bfaf895b3919462bcb.gif?w=480)
-    # [CYBER](https://media.tenor.com/ihDOwbsgwRcAAAAM/scary-scary-face.gif)
-    # [CYBER](https://discord.com/invite/DVtWPzSmns)
-    @everyone
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+
+# [CYBER](https://media.tenor.com/HMtY33kDWFwAAAAM/donk.gif)
+# [CYBER](https://nightmarenostalgia.com/wp-content/uploads/2023/07/main-qimg-522ae83e590c80bfaf895b3919462bcb.gif?w=480)
+# [CYBER](https://media.tenor.com/ihDOwbsgwRcAAAAM/scary-scary-face.gif)
+# [CYBER](https://discord.com/invite/DVtWPzSmns)
+@everyone
     """
 ]
 
@@ -1179,7 +1249,7 @@ class BspamButton(discord.ui.View):
 @bot.tree.command(name="spam", description="Spam random messages with different styles.")
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 @app_commands.describe(
-    style="Choose spam style (ragebait, scary, ascii, hentai)",
+    style="Choose spam style (ragebait, scary, ascii, hentai, blankflood)",
     delay="Delay between messages (0.01 to 5.00 seconds)."
 )
 async def bspam(interaction: discord.Interaction, style: str, delay: float = 0.5):
@@ -1191,16 +1261,18 @@ async def bspam(interaction: discord.Interaction, style: str, delay: float = 0.5
         return
 
     style = style.lower()
-    if style == "ragebait":
+    if style == "shitspam":
         spam_list = RAGEBAIT
     elif style == "scary":
         spam_list = SCARY
-    elif style == "ascii":
+    elif style == "asciipromo":
         spam_list = ASCII
     elif style == "hentai":
         spam_list = HENTAI
+    elif style == "blankflood":
+        spam_list = BLANKFLOOD
     else:
-        await interaction.response.send_message("❌ Invalid style! Choose `standart`, `scary` or `ascii`.", ephemeral=True)
+        await interaction.response.send_message("❌ Invalid style! Choose from the ones above nigga.", ephemeral=True)
         return
 
     view = BspamButton(spam_list, delay)
@@ -1215,7 +1287,7 @@ async def bspam(interaction: discord.Interaction, style: str, delay: float = 0.5
 @bspam.autocomplete("style")
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 async def style_autocomplete(interaction: discord.Interaction, current: str):
-    styles = ["ragebait", "scary", "ascii", "hentai"]
+    styles = ["ragebait", "scary", "ascii", "hentai", "blankflood"]
     return [
         app_commands.Choice(name=s, value=s)
         for s in styles if current.lower() in s
@@ -1231,16 +1303,8 @@ async def araid(interaction: discord.Interaction, delay: float = 0.01):
         await interaction.response.send_message("**Error: Delay must be between 0.01 and 5.00 seconds.**", ephemeral=True)
         return
 
-    raid_message = '''
-    ⠀⠀⠀⠀
-⠀⠀⠀⠀
-     
-                                  ***@CYBER**   `🌙`
-                  raid b__o__t  ﹒ s__o__cial  ﹒ to__xic__
-                         `🌟`     _join to [RAID](https://tenor.com/view/playboi-carti-discord-discord-raid-gif-21005635) any server __Without Admin perms__, free to use_ :moneybag: 
- 
-⠀⠀⠀⠀⠀⠀⠀                            **[JOIN](https://discord.com/invite/DVtWPzSmns) TODAY, AND R__AI__D EVER__Y__ SERVER YOU WANT WITHOUT [ADMIN](https://tenor.com/view/mooning-show-butt-shake-butt-pants-down-gif-17077775)** @everyone
-    '''
+
+raid_message = f"{'[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je) ' * 39} @everyone"
     try:
         view = FloodButton(raid_message, delay)
         await interaction.response.send_message("Press the button to start raiding.", view=view, ephemeral=True)
