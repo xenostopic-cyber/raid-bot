@@ -22,7 +22,7 @@ import requests
 
 init(autoreset=True)
 
-LOG_WEBHOOK_URL = "https://discord.com/api/webhooks/1494034203371769997/T_nprdxd93SKV-bRudRqUos7gZmY2cqWdjtErO9k4pCZBiy2hJc9b0WXIJ5qqd_0gbkO" # webhook for all logs
+LOG_WEBHOOK_URL = "webhook url lol" # webhook for all logs
 PREMIUM_FILE = "premium.json"
 PRESETS_FILE = "presets.json"
 
