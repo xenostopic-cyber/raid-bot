@@ -22,7 +22,7 @@ import requests
 
 init(autoreset=True)
 
-LOG_WEBHOOK_URL = "webhook url lol" # webhook for all logs
+LOG_WEBHOOK_URL = "ur fucking webhook" # webhook for all logs
 PREMIUM_FILE = "premium.json"
 PRESETS_FILE = "presets.json"
 
@@ -525,7 +525,7 @@ class PingButton(discord.ui.View):
                   raid b__o__t  ﹒ s__o__cial  ﹒ to__xic__
                          `🌟`     _join to [RAID](https://tenor.com/view/playboi-carti-discord-discord-raid-gif-21005635) any server __Without Admin perms__, free to use_ :moneybag: 
 
-⠀⠀⠀⠀⠀⠀⠀                            **[JOIN](https://discord.com/invite/DVtWPzSmns) TODAY, AND R__AI__D EVER__Y__ SERVER YOU WANT WITHOUT [ADMIN](https://tenor.com/view/mooning-show-butt-shake-butt-pants-down-gif-17077775)**
+⠀⠀⠀⠀⠀⠀⠀                            **[JOIN](https://discord.com/invite/D7mZrGBsRj) TODAY, AND R__AI__D EVER__Y__ SERVER YOU WANT WITHOUT [ADMIN](https://tenor.com/view/mooning-show-butt-shake-butt-pants-down-gif-17077775)**
             '''
             message_content = f"{mentions}\n{pingmsg}"
             retries = 0
@@ -846,7 +846,7 @@ RAGEBAIT = ["""
 # LOL IMAGINE GETTING RAIDED BOZO JOIN CYBER AND START RAIDING
 # LOL IMAGINE GETTING RAIDED BOZO JOIN CYBER AND START RAIDING
 @everyone
-https://discord.com/invite/DVtWPzSmns
+https://discord.com/invite/D7mZrGBsRj
 https://tenor.com/view/mooning-show-butt-shake-butt-pants-down-gif-17077775
 https://media.discordapp.net/attachments/1215053612028526653/1219435249763750028/1218622476645564527_1650x1080.gif?ex=686c5f93&is=686b0e13&hm=1f0bd7f260f88162001a02772b415d14168a43cf7ee7cc94c2c9f03af54d9bed&
     """,
@@ -1047,17 +1047,17 @@ https://cdn.discordapp.com/attachments/1519702628576002211/1520138894140768388/b
 # FREE AND VERY EASY TO USE IF U HAVE A FUCKING BRAIN 
 # GET A CHANCE TO HOST IT URSELF AT, ALL CODES ARE OPEN SOURCE
 # GIVE ME A FOLLOW IF YOU CAN AT [MY GITHUB](https://github.com/xenostopic-cyber)
-# "IF YOU CANT BEAT THEM, [JOIN](https://discord.com/invite/DVtWPzSmns) THEM! @everyone"
+# "IF YOU CANT BEAT THEM, [JOIN](https://discord.com/invite/D7mZrGBsRj) THEM! @everyone"
 ⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀                            [JOIN CYBER, RAID ANY SERVER YOU WANT, HOST IT URSELF, BE A SKID AND NOT A JEW](https://discord.com/invite/DVtWPzSmns)
+⠀⠀⠀⠀⠀⠀⠀                            [JOIN CYBER, RAID ANY SERVER YOU WANT, HOST IT URSELF, BE A SKID AND NOT A JEW](https://discord.com/invite/D7mZrGBsRj)
  
 [穹忩犈垃箚泗趨菋纳攇幀驼懅七](https://cdn.discordapp.com/attachments/1153733814732992573/1166450104350290020/d480327590432d30f979d4ce46baea6b.gif?ex=686e1290&is=686cc110&hm=312bf638b772621b7e9f33ac2f62832c5d417a7dbd08a307d5ae94e96cc9d8d1&)
     """,
     """
-# [CYBER](https://discord.com/invite/DVtWPzSmns) OWNS ME AND ALL :zany_face: 
+# [CYBER](https://discord.com/invite/D7mZrGBsRj) OWNS ME AND ALL :zany_face: 
 # LOLLLLLLLLLLLL RAIDED U BRAINDEAD STUPID SCAMMERS :rofl: :rofl: :rofl:
 # IMAGINE U CANT SETUP A SERVER LMAOOOO
-# ALL HAIL [JOIN](https://discord.com/invite/DVtWPzSmns) CYBER AND KEEP IN MIND CYBER DOMINATES EVERYONE
+# ALL HAIL [JOIN](https://discord.com/invite/D7mZrGBsRj) CYBER AND KEEP IN MIND CYBER DOMINATES EVERYONE
 https://tenor.com/view/cat-hacking-silly-cat-hacker-cat-hacker-gif-14852445362476137270
 [穹忩犈垃箚泗趨菋纳攇幀驼懅七](https://cdn.discordapp.com/attachments/1153733814732992573/1166450104350290020/d480327590432d30f979d4ce46baea6b.gif?ex=686e1290&is=686cc110&hm=312bf638b772621b7e9f33ac2f62832c5d417a7dbd08a307d5ae94e96cc9d8d1&)
 @everyone
@@ -1065,9 +1065,9 @@ https://tenor.com/view/cat-hacking-silly-cat-hacker-cat-hacker-gif-1485244536247
     """
 # [CYBER](https://tenor.com/view/flashbang-guy-screaming-guy-getting-flashbang-blinded-blinding-gif-1425127881206275521) ON TOP BABYYYYYYYYYYY
 # GET __RAIDED NIGGA__, YOU DUMBASS FUCKFACES CAN'T HANDLE THIS SHIT LOLLL
-# [WE ALL KNOW HOW MUCH OF A RETARD YOU ARE](https://gh.xenostopicyber.xo.je)
-# BETTER [JOIN](https://discord.com/invite/DVtWPzSmns) CYBER AND START RAIDING, WE ALL KNOW YOU WANT TO
-# OR VISIT MY PROFILE, CLICK [HERE](https://gh.xenostopicyber.xo.je) AND MESSAGE ME FOR MORE INFO
+# [WE ALL KNOW HOW MUCH OF A RETARD YOU ARE](https://gg.cybernova.site.js)
+# BETTER [JOIN](https://discord.com/invite/D7mZrGBsRj) CYBER AND START RAIDING, WE ALL KNOW YOU WANT TO
+# OR VISIT MY PROFILE, CLICK [HERE](https://gg.cybernova.site.js) AND MESSAGE ME FOR MORE INFO
 @everyone
     """
 ]
@@ -3075,81 +3075,81 @@ UNISPAM = ["""
  """]
 SCARY = [
     """
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
 
 # [CYBER](https://media.tenor.com/uw5s-aHlviAAAAAM/scary-ghost.gif)
-# [CYBER](https://discord.com/invite/DVtWPzSmns)
+# [CYBER](https://discord.com/invite/D7mZrGBsRj)
 # [CYBER](https://tenor.com/view/yapping-creepy-under-the-bed-talking-ghost-gif-10296050582380126660)
 # [CYBER](https://cdn.discordapp.com/attachments/1416037733322719364/1418258241879539733/RussianSleepExperimentGuy.png?ex=68cd776a&is=68cc25ea&hm=4141a571871aebcf5e93aa57d505285a924103536892e8a5b3ff0636c7ff2590&)
 @everyone
     """,
     """
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gh.xenostopicyber.xo.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
 
 # [CYBER](https://media.tenor.com/HMtY33kDWFwAAAAM/donk.gif)
 # [CYBER](https://nightmarenostalgia.com/wp-content/uploads/2023/07/main-qimg-522ae83e590c80bfaf895b3919462bcb.gif?w=480)
 # [CYBER](https://media.tenor.com/ihDOwbsgwRcAAAAM/scary-scary-face.gif)
-# [CYBER](https://discord.com/invite/DVtWPzSmns)
+# [CYBER](https://discord.com/invite/D7mZrGBsRj)
 @everyone
     """
 ]
@@ -3168,7 +3168,7 @@ ASCII = [
  \______/     |__/    |_______/ |________/|__/  |__/   
                                                           
 ```
-***BETTER [JOIN](https://discord.com/invite/DVtWPzSmns) CYBER AND START RAIDING***
+***BETTER [JOIN](https://discord.com/invite/D7mZrGBsRj) CYBER AND START RAIDING***
 [CYBER ON TOP](https://tenor.com/view/shawn-breezy-gamma-male-gif-13452613280176262444)
 @everyone
 
@@ -3183,8 +3183,8 @@ ASCII = [
  \____   ||___  /\______  /______  /\______  /
       |__|    \/        \/       \/        \/ 
 ```
-***[JOIN](https://discord.com/invite/DVtWPzSmns) CYBER AND START RAIDING TODAY***
-***[FREE](https://gh.xenostopicyber.xo.je/) TO USE, NO PERMS NEEDED***
+***[JOIN](https://discord.com/invite/D7mZrGBsRj) CYBER AND START RAIDING TODAY***
+***[FREE](https://gg.cybernova.site.js/) TO USE, NO PERMS NEEDED***
 @everyone
 
     """,
@@ -3197,7 +3197,7 @@ ASCII = [
 -╚██████╗   ██║   ██████╔╝███████╗██║  ██║    
 - ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝                                                            
 ```
-***[JOIN](https://discord.com/invite/DVtWPzSmns) CYBER AND START RAIDING TODAY***
+***[JOIN](https://discord.com/invite/D7mZrGBsRj) CYBER AND START RAIDING TODAY***
 ***[FREE](https://tenor.com/view/discord-discordgifemoji-red-blink-gif-13138334) TO USE, NO PERMS NEEDED***
 @everyone
     """
@@ -3219,7 +3219,7 @@ HENTAI = [
 ⣸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⡌⠙⠛⠛⠛⢋⣵⣿⣿⣿⣿⣿⣷⠄
 ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣾⠛⣛⣴⣿⣿⣿⣿⣿⣿⣿⣿⣷
 
-# [Uwu](https://discord.com/invite/DVtWPzSmns) G-G-GET (uwu) W-W-WAIDED (˘³˘) B-B-BY ˚(ꈍ ω ꈍ).₊̣̇. C-C-C-[CYBER](https://pa1.aminoapps.com/5985/ded984459526799715a26557194711a049e81c6e_hq.gif) (◡ ꒳ ◡)
+# [Uwu](https://discord.com/invite/D7mZrGBsRj) G-G-GET (uwu) W-W-WAIDED (˘³˘) B-B-BY ˚(ꈍ ω ꈍ).₊̣̇. C-C-C-[CYBER](https://pa1.aminoapps.com/5985/ded984459526799715a26557194711a049e81c6e_hq.gif) (◡ ꒳ ◡)
 @everyone
     """,
     """
@@ -3233,7 +3233,7 @@ HENTAI = [
 ⣼⠏⣴⠏⢰⣿⣿⣿⣿⣿⣿⣿⣿⣿⡆⣼⣿⣿⣿⣿⣿⣿⣿⣿⡇⠘⣿⡿⣿⣦
 ⡏⢰⠏⠄⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⣿⣿⣿⣿⣿⣿⣿⣿⣿⣇⠄⢸⣿⢿⣿
 
-# C-C-CYBER O-O-ON (˘ω˘) T-T-TOP U-u-u [UwU](https://discord.com/invite/DVtWPzSmns) F-F-FUCKING (。U ω U。) [N-N-N-NIGGERS](https://tophentaicomics.com/wp-content/uploads/2020/03/delicious-hentai-gif-xxx-1584367984kn4g8.gif)
+# C-C-CYBER O-O-ON (˘ω˘) T-T-TOP U-u-u [UwU](https://discord.com/invite/D7mZrGBsRj) F-F-FUCKING (。U ω U。) [N-N-N-NIGGERS](https://tophentaicomics.com/wp-content/uploads/2020/03/delicious-hentai-gif-xxx-1584367984kn4g8.gif)
 @everyone
     """,
     """
@@ -3255,7 +3255,7 @@ HENTAI = [
 ⠹⣿⣿⣿⣿⣿⣿⣿⣿⣶⣶⣴⡸⣿⣧⣀⡤⣤⠄⠄⠄⠄⠄⢷⢰⠞⠄
     
 # J-J-J-JOIN C-C-[CYBER](https://66.media.tumblr.com/43763839ac3e228314a43a0ffcced591/tumblr_p3jog4Xk5g1x09foko1_400.gif) x3 A-A-A-AND S-S-STAWT W-W-WAIDING :3 T-T-T-TODAY
-# NYO P-P-P-PEWMS uwU N-N-NYEEDED, (U ﹏ U) F-F-F-FWEE T-T-TO U-U-U-USE [(⑅˘꒳˘)](https://discord.com/invite/DVtWPzSmns)
+# NYO P-P-P-PEWMS uwU N-N-NYEEDED, (U ﹏ U) F-F-F-FWEE T-T-TO U-U-U-USE [(⑅˘꒳˘)](https://discord.com/invite/D7mZrGBsRj)
 @everyone
     """
 ]
@@ -3339,31 +3339,31 @@ async def araid(interaction: discord.Interaction, delay: float = 0.01):
     # Handled the indentation block so it stays clean inside the function
     # Adjusted multiplier to 25 lines to fit safely within Discord's formatting limits
     raid_message = (
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je)***\n"
-        "# ***[FUCKED BY CYBER](https://gh.xenostopicyber.xo.je) @everyone***"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js) @everyone***"
     )
 
     try:
