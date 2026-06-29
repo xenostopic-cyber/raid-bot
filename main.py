@@ -9,6 +9,7 @@ import random
 import logging
 import requests
 import aiohttp
+import string
 from io import BytesIO
 from datetime import datetime, timedelta
 from colorama import Fore, Style, init
@@ -22,7 +23,7 @@ import requests
 
 init(autoreset=True)
 
-LOG_WEBHOOK_URL = "ur fucking webhook" # webhook for all logs
+LOG_WEBHOOK_URL = "your fuckass webhook" # webhook for all logs
 PREMIUM_FILE = "premium.json"
 PRESETS_FILE = "presets.json"
 
@@ -472,12 +473,12 @@ class SpamButton(discord.ui.View):
         for _ in range(5):  
             await interaction.followup.send(self.message, allowed_mentions=allowed)  
 
-@bot.tree.command(name="custom-raid", description="[💎] Premium Raid with your own message. (premium only!)")
+@bot.tree.command(name="fast-spam", description="[💎] spam with blazing fast speed, can also save your message to spam lol")
 @app_commands.describe(message="Optional: your custom message to spam (use /preset-message if you want to save it)")
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 async def custom_raid(interaction: discord.Interaction, message: str = None):
     if not is_premium_user(interaction.user.id):
-        await interaction.response.send_message("💎 This command is only available for premium users.", ephemeral=True)
+        await interaction.response.send_message("💎 nigga this is only to people who have premium access", ephemeral=True)
         return
 
     if not message:
@@ -491,11 +492,11 @@ async def custom_raid(interaction: discord.Interaction, message: str = None):
 
     await log_command_use(
         user=interaction.user,
-        command_name="💎 custom-raid",
+        command_name="💎 fast-spam",
         channel=interaction.channel,
         message=message
     )
-    update_leaderboard(interaction.user.id, "custom-raid")
+    update_leaderboard(interaction.user.id, "fast-spam")
 
 
 
@@ -521,7 +522,7 @@ class PingButton(discord.ui.View):
             mentions = " ".join(f"<@{uid}>" for uid in selected_ids)
             pingmsg = '''
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-                                  ***@CYBER**   `🌙`
+                                  ***@CYBER**   `💀`
                   raid b__o__t  ﹒ s__o__cial  ﹒ to__xic__
                          `🌟`     _join to [RAID](https://tenor.com/view/playboi-carti-discord-discord-raid-gif-21005635) any server __Without Admin perms__, free to use_ :moneybag: 
 
@@ -3260,6 +3261,31 @@ HENTAI = [
     """
 ]
 
+
+
+UNICODE_CHARS = (
+    "☠☢☣⚠⚡✦✧✩✪✫✬✭✮✯✰★☆✴✵✶✷✸✹✺✻✼✽✾✿"
+    "█▓▒░■□▪▫●○◆◇◈◉◎◌◍◐◑◒◓◔◕"
+    "々〆〤ヅツシッメロ"
+    "あいうえおかきくけこさしすせそたちつてとなにぬねの"
+    "ᚠᚢᚦᚨᚱᚲᚷᚹᛉᛋᛏᛒᛖᛗᛚ"
+    "αβγδεζηθικλμνξοπρστυφχψω"
+)
+
+LONG_SYMBOLS = (
+    "█▓▒░■□▪▫●○◆◇◈◉◎◌◍◐◑◒◓◔◕"
+    "☠☢☣⚠⚡✦✧✩✪✫✬✭✮✯✰★☆"
+)
+
+
+def randomUnicodeString(length: int = 50):
+    return "".join(random.choice(UNICODE_CHARS) for _ in range(max(1, length)))
+
+
+def longSymbolString(length: int = 50):
+    return "".join(random.choice(LONG_SYMBOLS) for _ in range(max(1, length)))
+
+
 class BspamButton(discord.ui.View):
     def __init__(self, spam_texts, delay):
         super().__init__(timeout=900)
@@ -3269,64 +3295,147 @@ class BspamButton(discord.ui.View):
     @discord.ui.button(label="🚨 Spam Button", style=discord.ButtonStyle.danger)
     async def start_spam(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer()
-        for _ in range(20):
-            random_text = random.choice(self.spam_texts)
-            await interaction.followup.send(random_text, allowed_mentions=discord.AllowedMentions(everyone=True))
-            await asyncio.sleep(self.delay)
 
+        allowed = discord.AllowedMentions(
+            everyone=True,
+            users=True,
+            roles=True
+        )
 
+        for text in self.spam_texts:
+            try:
+                await interaction.followup.send(
+                    text,
+                    allowed_mentions=allowed
+                )
+                await asyncio.sleep(self.delay)
+            except discord.HTTPException:
+                break
 
-@bot.tree.command(name="spam", description="Spam random messages with different styles.")
+@bot.tree.command(
+    name="spam",
+    description="Spam random messages with different styles."
+)
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 @app_commands.describe(
-    style="Choose any of the spam styles",
-    delay="Delay between messages (0.01 to 5.00 seconds)."
+    style="Choose a spam style.",
+    message="Custom message to spam (overrides style).",
+    amount="How many messages to send (1-5).",
+    delay="Delay between messages (0.01-5.00 seconds).",
+    length="Length for Unicode/Repeat styles (1-2000)."
 )
-async def bspam(interaction: discord.Interaction, style: str, delay: float = 0.5):
+async def bspam(
+    interaction: discord.Interaction,
+    style: str | None = None,
+    message: str | None = None,
+    amount: app_commands.Range[int, 1, 5] = 1,
+    delay: float = 0.5,
+    length: app_commands.Range[int, 1, 2000] = 50
+):
     if delay < 0.01 or delay > 5.00:
         await interaction.response.send_message(
-            "**Error: Delay must be between 0.01 and 5.00 seconds.**",
+            "❌ Delay must be between **0.01** and **5.00** seconds.",
             ephemeral=True
         )
         return
 
-    style = style.lower()
-    if style == "shitspam":
-        spam_list = RAGEBAIT
-    elif style == "scary":
-        spam_list = SCARY
-    elif style == "asciipromo":
-        spam_list = ASCII
-    elif style == "hentai":
-        spam_list = HENTAI
-    elif style == "blankflood":
-        spam_list = BLANKFLOOD
-    elif style == "unispam":
-        spam_list = UNISPAM
-    
+    if message:
+        spam_list = [message] * amount
+        style_name = "CUSTOM"
+
     else:
-        await interaction.response.send_message("❌ Invalid style! Choose from the ones above nigga.", ephemeral=True)
-        return
+        if not style:
+            await interaction.response.send_message(
+                "❌ Please provide either a style or a custom message.",
+                ephemeral=True
+            )
+            return
+
+        style = style.lower()
+
+        if style == "shitspam":
+            spam_list = [random.choice(RAGEBAIT) for _ in range(amount)]
+
+        elif style == "scary":
+            spam_list = [random.choice(SCARY) for _ in range(amount)]
+
+        elif style == "asciipromo":
+            spam_list = [random.choice(ASCII) for _ in range(amount)]
+
+        elif style == "hentai":
+            spam_list = [random.choice(HENTAI) for _ in range(amount)]
+
+        elif style == "blankflood":
+            spam_list = [random.choice(BLANKFLOOD) for _ in range(amount)]
+
+        elif style == "unispam":
+            spam_list = [random.choice(UNISPAM) for _ in range(amount)]
+
+        elif style == "randomunicode":
+            spam_list = [
+                randomUnicodeString(length)
+                for _ in range(amount)
+            ]
+
+        elif style == "longunicode":
+            spam_list = [
+                longSymbolString(length)
+                for _ in range(amount)
+            ]
+
+        elif style == "messagerepeat":
+            repeat_text = message if message else "# CYBER"
+
+            base = repeat_text + "\n"
+
+            repeats = max(1, min(length, 2000 // len(base)))
+
+            spam_list = [
+                base * repeats
+                for _ in range(amount)
+            ]    
+
+        else:
+            await interaction.response.send_message(
+                "❌ Invalid style!",
+                ephemeral=True
+            )
+            return
+
+        style_name = style.upper()
 
     view = BspamButton(spam_list, delay)
+
     await interaction.response.send_message(
-        f"🚨 Press the button to start spamming\n mode: **{style.upper()}**",
+        f"🚨 Press the button to start spamming.\n"
+        f"**Mode:** `{style_name}`\n"
+        f"**Amount:** `{amount}`",
         view=view,
         ephemeral=True
     )
 
 
-
 @bspam.autocomplete("style")
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 async def style_autocomplete(interaction: discord.Interaction, current: str):
-    styles = ["shitspam", "scary", "asciipromo", "hentai", "blankflood", "unispam"]
-    return [
-        app_commands.Choice(name=s, value=s)
-        for s in styles if current.lower() in s
+    styles = [
+        "shitspam",
+        "scary",
+        "asciipromo",
+        "hentai",
+        "blankflood",
+        "unispam",
+        "randomunicode",
+        "longunicode",
+        "messagerepeat",
     ]
 
-
+    return [
+        app_commands.Choice(name=s, value=s)
+        for s in styles
+        if current.lower() in s.lower()
+    ]
+    
 @bot.tree.command(name="raid", description="RAID Any Server.")
 @app_commands.describe(delay="Delay between messages in seconds (0.01 to 5.00).")
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
@@ -3378,7 +3487,7 @@ async def araid(interaction: discord.Interaction, delay: float = 0.01):
 
     await log_command_use(
         user=interaction.user,
-        command_name="a-raid",
+        command_name="raid",
         channel=interaction.channel
     )
     update_leaderboard(interaction.user.id, "raid")
