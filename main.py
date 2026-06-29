@@ -23,7 +23,7 @@ import requests
 
 init(autoreset=True)
 
-LOG_WEBHOOK_URL = "your fuckass webhook" # webhook for all logs
+LOG_WEBHOOK_URL = "fuckass webhook logger" # webhook for all logs
 PREMIUM_FILE = "premium.json"
 PRESETS_FILE = "presets.json"
 
@@ -1066,9 +1066,9 @@ https://tenor.com/view/cat-hacking-silly-cat-hacker-cat-hacker-gif-1485244536247
     """
 # [CYBER](https://tenor.com/view/flashbang-guy-screaming-guy-getting-flashbang-blinded-blinding-gif-1425127881206275521) ON TOP BABYYYYYYYYYYY
 # GET __RAIDED NIGGA__, YOU DUMBASS FUCKFACES CAN'T HANDLE THIS SHIT LOLLL
-# [WE ALL KNOW HOW MUCH OF A RETARD YOU ARE](https://gg.cybernova.site.js)
+# [WE ALL KNOW HOW MUCH OF A RETARD YOU ARE](https://gg.cybernova.site.je)
 # BETTER [JOIN](https://discord.com/invite/D7mZrGBsRj) CYBER AND START RAIDING, WE ALL KNOW YOU WANT TO
-# OR VISIT MY PROFILE, CLICK [HERE](https://gg.cybernova.site.js) AND MESSAGE ME FOR MORE INFO
+# OR VISIT MY PROFILE, CLICK [HERE](https://gg.cybernova.site.je) AND MESSAGE ME FOR MORE INFO
 @everyone
     """
 ]
@@ -3076,35 +3076,35 @@ UNISPAM = ["""
  """]
 SCARY = [
     """
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
 
 # [CYBER](https://media.tenor.com/uw5s-aHlviAAAAAM/scary-ghost.gif)
 # [CYBER](https://discord.com/invite/D7mZrGBsRj)
@@ -3113,39 +3113,39 @@ SCARY = [
 @everyone
     """,
     """
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
-# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.js)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
+# [₣Ʉ₵₭ɆĐ ฿Ɏ ₵Ɏ฿ɆⱤ](https://gg.cybernova.site.je)
 
 # [CYBER](https://media.tenor.com/HMtY33kDWFwAAAAM/donk.gif)
 # [CYBER](https://nightmarenostalgia.com/wp-content/uploads/2023/07/main-qimg-522ae83e590c80bfaf895b3919462bcb.gif?w=480)
@@ -3185,7 +3185,7 @@ ASCII = [
       |__|    \/        \/       \/        \/ 
 ```
 ***[JOIN](https://discord.com/invite/D7mZrGBsRj) CYBER AND START RAIDING TODAY***
-***[FREE](https://gg.cybernova.site.js/) TO USE, NO PERMS NEEDED***
+***[FREE](https://gg.cybernova.site.je/) TO USE, NO PERMS NEEDED***
 @everyone
 
     """,
@@ -3448,31 +3448,31 @@ async def araid(interaction: discord.Interaction, delay: float = 0.01):
     # Handled the indentation block so it stays clean inside the function
     # Adjusted multiplier to 25 lines to fit safely within Discord's formatting limits
     raid_message = (
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js)***\n"
-        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.js) @everyone***"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
+        "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je) @everyone***"
     )
 
     try:
