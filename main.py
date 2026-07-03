@@ -3509,13 +3509,16 @@ async def araid(interaction: discord.Interaction, delay: float = 0.01):
 async def threadspammer(
     ctx: discord.Interaction,
     token: str,
-    channelid: int,
+    channelid: str,
     delay: int,
     amount: int,
     message: str,
-    userid: int
+    userid: str
 ):
+
     # Validate inputs
+    channel_id = int(channelid)
+    user_id = int(userid)
     if delay < 1000:
         delay = 1000
     if delay > 10000:
