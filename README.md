@@ -5,19 +5,21 @@ An asynchronous Discord bot built with `discord.py` and `aiohttp` that provides 
 ## Features
 
 ### Administrative & Server Operations
-* **`/servernuke`**: Automates server configuration changes including channel recreation, role adjustments, and messaging loops.
-* **`/create_invites`**: Generates invite links for servers the bot resides in.
+* **`/servernuke`**: Server nuke with your bot token lol
+* **`/create_invites`**: Generates invite links for servers YOUR bot lives in (yes your token)
 * **`/preset-message`**: Premium feature allowing users to set up a custom message template.
 
 ### Automation & Communication Utilities
-* **`/fast-spam` / `/spam`**: Sends predefined text formatting variations (such as ASCII, Unicode strings, or custom messages) at defined intervals.
+* **`/fast-spam` / `/spam`**: Sends predefined text formatting variations (such as ASCII, Unicode strings, or custom messages) at defined intervals and spams it in servers.
 * **`/threadspam`**: Utility for automating thread creation within specified channels.
 * **`/webhookspam`**: Dispatches automated messages to a target Discord Webhook URL.
 * **`/say`**: Instructs the bot to repeat an input message anonymously.
 * **`/anon-dm` / `/flooduser`**: Sends anonymous or high-frequency direct messages to specified users.
 * **`/ghostping`**: Sends and immediately removes mentions to specific users.
+* **`/raid`**: Sends our raid text to raid servers and promote the bot and the discord server.
 
-### Simulation & Fun Commands
+
+### Simulation & Fake Commands
 * **`/ip`**: Simulates a network alert interface containing randomized parameters.
 * **`/hack`**: Displays a mock account information output block containing placeholder data fields.
 * **`/avatar`**: Fetches and provides download links for a specified user's profile icon and banner.
