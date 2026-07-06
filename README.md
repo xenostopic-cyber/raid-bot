@@ -1,6 +1,6 @@
 
 
-An asynchronous Discord bot built with `discord.py` and `aiohttp` that provides various utilities, moderation alternatives, simulation utilities, and premium management features.
+An asynchronous Discord bot built with `discord.py` and `aiohttp` that raid a server!
 
 ## Features
 
