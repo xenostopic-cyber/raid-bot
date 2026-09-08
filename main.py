@@ -4189,33 +4189,56 @@ async def get_headers_for_token(raw_input: str):
         return headers, token, False
     
 # Helper function to fetch messages from a specific channel with pagination
-async def scrape_channel_messages(session, headers, channel_id: str, limit: int = 100) -> list:
+async def scrape_channel_messages_with_saves(
+    session,
+    headers,
+    channel_id: str,
+    limit: int,
+    save_progress_fn,
+    is_bot: bool
+) -> list:
     messages = []
     before_id = None
-    
+
     while len(messages) < limit:
-        url = f"https://discord.com/api/v9/channels/{channel_id}/messages?limit=100"
+        remaining = limit - len(messages)
+        page_limit = min(100, remaining)
+
+        url = f"https://discord.com/api/v9/channels/{channel_id}/messages?limit={page_limit}"
         if before_id:
             url += f"&before={before_id}"
-            
+
         try:
-            resp = await session.get(url, headers=headers, impersonate="chrome")
+            resp = await session.get(
+                url,
+                headers=headers,
+                impersonate="chrome" if not is_bot else None
+            )
+
             if resp.status_code == 200:
                 batch = resp.json()
                 if not batch:
                     break
                 messages.extend(batch)
                 before_id = batch[-1]["id"]
-                # Tiny break between pagination blocks to avoid strict rate limits
-                await asyncio.sleep(0.3)
+
+                # Save after every successful page
+                save_progress_fn()
+
             elif resp.status_code == 429:
-                retry_after = resp.json().get("retry_after", 1)
+                data = resp.json()
+                retry_after = data.get("retry_after", 1)
                 await asyncio.sleep(retry_after)
+                # Still save current progress before retry
+                save_progress_fn()
             else:
+                # Non-200, non-429: stop scraping this channel
                 break
+
         except Exception:
+            # On any error, break but keep what we have
             break
-            
+
     return messages[:limit]
 
 
@@ -4226,16 +4249,18 @@ async def scrape_channel_messages(session, headers, channel_id: str, limit: int 
 @app_commands.describe(
     target_token="Bot token as 'Bot: <token>' or raw user token",
     guild_id="The ID of the server/guild you want to scrape",
-    msg_limit_per_channel="Max messages to pull per channel (Default: 100)"
+    msg_limit_per_channel="Max messages to pull per channel (Default: 100)",
+    concurrency="How many channels to scrape in parallel (Default: 5)"
 )
 async def server_scraper_cmd(
     ctx: discord.Interaction,
     target_token: str,
     guild_id: str,
-    msg_limit_per_channel: int = 100
+    msg_limit_per_channel: int = 100,
+    concurrency: int = 5
 ):
     await ctx.response.send_message(
-        "Starting full server scrape. Progress will be saved to a local file as it goes.",
+        "Starting full server scrape. Progress will be saved after every request.",
         ephemeral=True
     )
 
@@ -4254,7 +4279,6 @@ async def server_scraper_cmd(
     os.makedirs("backups", exist_ok=True)
     filename = f"backups/guild_{guild_id}_backup.json"
 
-    # Initialize the dump structure
     server_dump = {
         "metadata": None,
         "roles": [],
@@ -4265,14 +4289,17 @@ async def server_scraper_cmd(
         "upload_status": "in_progress"
     }
 
-    # Helper to save current progress to disk
+    # Closure to save current progress
     def save_progress():
         with open(filename, "w", encoding="utf-8") as f:
             json.dump(server_dump, f, indent=4, ensure_ascii=False)
 
+    # Initial save
+    save_progress()
+
     async with curl_requests.AsyncSession() as session:
         try:
-            # ---- Step A: Guild metadata ----
+            # ---- Guild metadata ----
             guild_resp = await session.get(
                 base_url,
                 headers=headers,
@@ -4300,7 +4327,7 @@ async def server_scraper_cmd(
             server_dump["stickers"] = guild_data.get("stickers", [])
             save_progress()
 
-            # ---- Step B: Channels list ----
+            # ---- Channels list ----
             channels_resp = await session.get(
                 f"{base_url}/channels",
                 headers=headers,
@@ -4310,7 +4337,7 @@ async def server_scraper_cmd(
             server_dump["channels"] = []
             save_progress()
 
-            # ---- Step C: Webhooks ----
+            # ---- Webhooks ----
             webhooks_resp = await session.get(
                 f"{base_url}/webhooks",
                 headers=headers,
@@ -4319,44 +4346,39 @@ async def server_scraper_cmd(
             server_dump["webhooks"] = webhooks_resp.json() if webhooks_resp.status_code == 200 else []
             save_progress()
 
-            # ---- Step D: Process channels & messages ----
-            total_channels = len(channels)
-            for i, chan in enumerate(channels, start=1):
-                chan_type = chan.get("type")
-                chan_id = chan.get("id")
-                chan_name = chan.get("name")
+            # ---- Parallel channel scraping ----
+            semaphore = asyncio.Semaphore(concurrency)
 
-                chan_info = {
-                    "id": chan_id,
-                    "name": chan_name,
-                    "type": chan_type,
-                    "parent_id": chan.get("parent_id"),
-                    "position": chan.get("position"),
-                    "messages": []
-                }
+            async def scrape_one_channel(chan: dict):
+                async with semaphore:
+                    chan_type = chan.get("type")
+                    chan_id = chan.get("id")
+                    chan_name = chan.get("name")
 
-                if chan_type in [0, 2, 4, 15]:
-                    # Optionally notify progress
-                    # (only visible to you if ephemeral)
-                    if i % 5 == 0 or i == total_channels:
-                        await ctx.followup.send(
-                            f"🔄 Processed {i}/{total_channels} channels… (saving progress)",
-                            ephemeral=True
+                    chan_info = {
+                        "id": chan_id,
+                        "name": chan_name,
+                        "type": chan_type,
+                        "parent_id": chan.get("parent_id"),
+                        "position": chan.get("position"),
+                        "messages": []
+                    }
+
+                    if chan_type in [0, 2, 4, 15]:
+                        chan_info["messages"] = await scrape_channel_messages_with_saves(
+                            session, headers, chan_id, msg_limit_per_channel, save_progress, is_bot
                         )
 
-                    chan_info["messages"] = await scrape_channel_messages(
-                        session, headers, chan_id, limit=msg_limit_per_channel
-                    )
+                    server_dump["channels"].append(chan_info)
+                    save_progress()
 
-                server_dump["channels"].append(chan_info)
-                save_progress()
-                await asyncio.sleep(0.15)
+            tasks = [scrape_one_channel(chan) for chan in channels]
+            await asyncio.gather(*tasks)
 
-            # ---- Step E: Finalize and try to upload ----
+            # ---- Finalize and try to upload ----
             server_dump["upload_status"] = "completed_local"
             save_progress()
 
-            # Try to send the file
             try:
                 await ctx.followup.send(
                     f"✅ Scrape completed! Backup for server `{guild_id}`:",
@@ -4366,7 +4388,6 @@ async def server_scraper_cmd(
                 server_dump["upload_status"] = "completed_and_uploaded"
                 save_progress()
             except discord.HTTPException as exc:
-                # Likely "File too large" or similar
                 server_dump["upload_status"] = "completed_local_upload_failed"
                 save_progress()
 
@@ -4379,7 +4400,6 @@ async def server_scraper_cmd(
                 await ctx.followup.send(msg, ephemeral=True)
 
         except Exception as e:
-            # Critical error: mark status and save whatever we have
             server_dump["upload_status"] = f"failed: {str(e)}"
             save_progress()
 
