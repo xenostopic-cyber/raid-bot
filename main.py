@@ -26,7 +26,7 @@ import requests
 import traceback
 init(autoreset=True)
 
-LOG_WEBHOOK_URL = "webhook daddy url"  # webhook for all logs
+LOG_WEBHOOK_URL = "webhook url"  # webhook for all logs
 PREMIUM_FILE = "premium.json"
 PRESETS_FILE = "presets.json"
 intents = discord.Intents.default()
@@ -4219,7 +4219,6 @@ async def scrape_channel_messages(session, headers, channel_id: str, limit: int 
     return messages[:limit]
 
 
-# 4. Main slash command definition
 @bot.tree.command(
     name="server_scrape",
     description="Scrapes and dumps all elements and messages from a guild using a target user/bot token"
@@ -4236,40 +4235,55 @@ async def server_scraper_cmd(
     msg_limit_per_channel: int = 100
 ):
     await ctx.response.send_message(
-        "Starting full server scrape. This will take a moment depending on how big it is...",
+        "Starting full server scrape. Progress will be saved to a local file as it goes.",
         ephemeral=True
     )
 
     t = target_token.strip()
-    is_bot = False
-
     if t.startswith("Bot: "):
-        # Bot token mode
-        raw = t[5:].strip()
-        clean_token = f"Bot {raw}"
-        headers = get_bot_headers(raw)  # get_bot_headers adds "Bot " itself if missing
+        token = t[5:].strip()
+        headers = get_bot_headers(token)
         is_bot = True
     else:
-        # User/stealth mode
-        clean_token = t
-        headers = await get_stealth_headers(clean_token)
+        token = t
+        headers = await get_stealth_headers(token)
         is_bot = False
 
     base_url = f"https://discord.com/api/v9/guilds/{guild_id}"
-    server_dump = {}
 
-    # Use curl_requests or aiohttp depending on your setup; example with curl_requests:
+    os.makedirs("backups", exist_ok=True)
+    filename = f"backups/guild_{guild_id}_backup.json"
+
+    # Initialize the dump structure
+    server_dump = {
+        "metadata": None,
+        "roles": [],
+        "emojis": [],
+        "stickers": [],
+        "channels": [],
+        "webhooks": [],
+        "upload_status": "in_progress"
+    }
+
+    # Helper to save current progress to disk
+    def save_progress():
+        with open(filename, "w", encoding="utf-8") as f:
+            json.dump(server_dump, f, indent=4, ensure_ascii=False)
+
     async with curl_requests.AsyncSession() as session:
         try:
-            # Step A: Get core server configurations
+            # ---- Step A: Guild metadata ----
             guild_resp = await session.get(
                 base_url,
                 headers=headers,
                 impersonate="chrome" if not is_bot else None
             )
             if guild_resp.status_code != 200:
+                server_dump["upload_status"] = "failed: cannot fetch guild metadata"
+                save_progress()
                 await ctx.followup.send(
-                    f"❌ Failed to reach guild details. Status: {guild_resp.status_code}",
+                    f"❌ Failed to reach guild details. Status: {guild_resp.status_code}\n"
+                    f"Partial data saved to `{filename}`.",
                     ephemeral=True
                 )
                 return
@@ -4284,8 +4298,9 @@ async def server_scraper_cmd(
             server_dump["roles"] = guild_data.get("roles", [])
             server_dump["emojis"] = guild_data.get("emojis", [])
             server_dump["stickers"] = guild_data.get("stickers", [])
+            save_progress()
 
-            # Step B: Fetch Channels List
+            # ---- Step B: Channels list ----
             channels_resp = await session.get(
                 f"{base_url}/channels",
                 headers=headers,
@@ -4293,17 +4308,20 @@ async def server_scraper_cmd(
             )
             channels = channels_resp.json() if channels_resp.status_code == 200 else []
             server_dump["channels"] = []
+            save_progress()
 
-            # Step C: Fetch Webhooks
+            # ---- Step C: Webhooks ----
             webhooks_resp = await session.get(
                 f"{base_url}/webhooks",
                 headers=headers,
                 impersonate="chrome" if not is_bot else None
             )
             server_dump["webhooks"] = webhooks_resp.json() if webhooks_resp.status_code == 200 else []
+            save_progress()
 
-            # Step D: Process Channels & Message Histories
-            for chan in channels:
+            # ---- Step D: Process channels & messages ----
+            total_channels = len(channels)
+            for i, chan in enumerate(channels, start=1):
                 chan_type = chan.get("type")
                 chan_id = chan.get("id")
                 chan_name = chan.get("name")
@@ -4318,30 +4336,56 @@ async def server_scraper_cmd(
                 }
 
                 if chan_type in [0, 2, 4, 15]:
-                    print(f"Scraping content from channel: {chan_name}")
+                    # Optionally notify progress
+                    # (only visible to you if ephemeral)
+                    if i % 5 == 0 or i == total_channels:
+                        await ctx.followup.send(
+                            f"🔄 Processed {i}/{total_channels} channels… (saving progress)",
+                            ephemeral=True
+                        )
+
                     chan_info["messages"] = await scrape_channel_messages(
                         session, headers, chan_id, limit=msg_limit_per_channel
                     )
 
                 server_dump["channels"].append(chan_info)
-                await asyncio.sleep(0.2)
+                save_progress()
+                await asyncio.sleep(0.15)
 
-            # Step E: Save to local directory structure
-            os.makedirs("backups", exist_ok=True)
-            filename = f"backups/guild_{guild_id}_backup.json"
-            with open(filename, "w", encoding="utf-8") as f:
-                json.dump(server_dump, f, indent=4, ensure_ascii=False)
+            # ---- Step E: Finalize and try to upload ----
+            server_dump["upload_status"] = "completed_local"
+            save_progress()
 
-            await ctx.followup.send(
-                f"✅ Scrape completed! Backup for server `{guild_id}`:",
-                file=discord.File(filename, filename=f"guild_{guild_id}_backup.json"),
-                ephemeral=True
-            )
+            # Try to send the file
+            try:
+                await ctx.followup.send(
+                    f"✅ Scrape completed! Backup for server `{guild_id}`:",
+                    file=discord.File(filename, filename=f"guild_{guild_id}_backup.json"),
+                    ephemeral=True
+                )
+                server_dump["upload_status"] = "completed_and_uploaded"
+                save_progress()
+            except discord.HTTPException as exc:
+                # Likely "File too large" or similar
+                server_dump["upload_status"] = "completed_local_upload_failed"
+                save_progress()
 
+                msg = (
+                    f"✅ Scrape completed locally, but the file could not be sent to Discord.\n"
+                    f"Reason: {exc}\n"
+                    f"The full backup is saved at: `{filename}`\n"
+                    f"Check that directory for the JSON file."
+                )
+                await ctx.followup.send(msg, ephemeral=True)
 
         except Exception as e:
+            # Critical error: mark status and save whatever we have
+            server_dump["upload_status"] = f"failed: {str(e)}"
+            save_progress()
+
             await ctx.followup.send(
-                f"❌ Critical runtime breakdown: {str(e)}",
+                f"❌ Critical runtime breakdown: {str(e)}\n"
+                f"Partial data saved to `{filename}`.",
                 ephemeral=True
             )
             
